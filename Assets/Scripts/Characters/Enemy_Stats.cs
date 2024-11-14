@@ -4,12 +4,14 @@ using UnityEngine;
 public class Enemy_Stats : CharacterStats
 {
     public static Action<int> OnEnemyDie;
+    private DropItem myDropSystem;
 
     [SerializeField] private int xpReward = 5;
 
     protected override void Start()
     {
         base.Start();
+        myDropSystem = GetComponent<DropItem>();
     }
 
     protected override void Update()
@@ -23,6 +25,7 @@ public class Enemy_Stats : CharacterStats
 
         if (currentHealth <= 0)
         {
+            myDropSystem.ItemDrop();
             OnEnemyDie?.Invoke(xpReward);
         }
     }
