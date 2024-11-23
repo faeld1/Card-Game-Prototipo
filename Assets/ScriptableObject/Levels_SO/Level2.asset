@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad0d146209b5ec3488131321fa395636, type: 3}
+  m_Name: Level2
+  m_EditorClassIdentifier: 
+  levelName: Level2
+  levelNumber: 2
+  isUnlocked: 1
+  subLevel1Enemies:
+  - {fileID: 3559638728608176151, guid: 20e81f38fc44d9e4abad89a37b545165, type: 3}
+  subLevel2Enemies:
+  - {fileID: 3559638728608176151, guid: 20e81f38fc44d9e4abad89a37b545165, type: 3}
+  subLevel3Enemies:
+  - {fileID: 3559638728608176151, guid: 9bbf04d67a8726b40b3b223b57b5a062, type: 3}
+  - {fileID: 3559638728608176151, guid: 9bbf04d67a8726b40b3b223b57b5a062, type: 3}
+  subLevel4Enemies:
+  - {fileID: 3559638728608176151, guid: 20e81f38fc44d9e4abad89a37b545165, type: 3}
+  - {fileID: 3559638728608176151, guid: 20e81f38fc44d9e4abad89a37b545165, type: 3}
+  subLevel5Enemies:
+  - {fileID: 3559638728608176151, guid: 9bbf04d67a8726b40b3b223b57b5a062, type: 3}
+  - {fileID: 3559638728608176151, guid: 20e81f38fc44d9e4abad89a37b545165, type: 3}
+  - {fileID: 3559638728608176151, guid: 20e81f38fc44d9e4abad89a37b545165, type: 3}

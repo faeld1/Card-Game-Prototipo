@@ -25,7 +25,7 @@ public class Enemy_Stats : CharacterStats
 
         if (currentHealth <= 0)
         {
-            myDropSystem.ItemDrop();
+            myDropSystem.GenerateDrop();
             OnEnemyDie?.Invoke(xpReward);
         }
     }

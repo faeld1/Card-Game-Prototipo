@@ -15,9 +15,11 @@ public class Inventory : MonoBehaviour
 
     private UI_ItemSlot[] inventoryItemSlot;
 
-    [Header("Itens Dropaveis")]
+    [Header("Itens Dropaveis/Craftaveis")]
     public int bless;
     public int creations;
+
+    public int blessDust;
 
 
     public Transform bagContainer;
@@ -41,6 +43,7 @@ public class Inventory : MonoBehaviour
 
         inventoryItemSlot = inventorySlotParent.GetComponentsInChildren<UI_ItemSlot>();
 
+        LoadInventoryData();
         AddStartingItems();
     }
     private void AddStartingItems()
@@ -71,6 +74,8 @@ public class Inventory : MonoBehaviour
             inventoryDirectionary.Add(_item, newItem);
         }
 
+        SaveInventoryData();
+
         UpdateSlotUI();
     }
 
@@ -80,14 +85,28 @@ public class Inventory : MonoBehaviour
         {
             value.RemoveStack();
         }
+
+        SaveInventoryData();
     }
 
-    private void UpdateSlotUI()
+    public void UpdateSlotUI()
     {
         for(int i = 0; i < inventoryItems.Count; i++)
         {
             inventoryItemSlot[i].UpdateSlot(inventoryItems[i]);
         }
+    }
+
+    private void SaveInventoryData()
+    {
+        ES3.Save("Bless", bless);
+        ES3.Save("Creation", creations);
+    }
+
+    private void LoadInventoryData()
+    {
+        bless = ES3.Load("Bless", defaultValue: 0);
+        creations = ES3.Load("Creation", defaultValue: 0);
     }
 
 }

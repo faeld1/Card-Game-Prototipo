@@ -15,4 +15,4 @@ MonoBehaviour:
   itemName: Bless
   itemIcon: {fileID: -1523476312, guid: a9ca9a41598dd2e44b125928045c518f, type: 3}
   itemType: 0
-  dropChance: 0
+  dropChance: 47.7

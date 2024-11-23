@@ -76,12 +76,18 @@ public class BattleManager : MonoBehaviour
         for (int i = 0; i < enemies.Length; i++)
         {
             CharacterStats enemy = enemies[i];
-            if (enemy.currentHealth > 0)
+            if (enemy.currentHealth > 0 && enemy != null)
             {
                 playerStats.TakeDamage(10); // Dano fixo de 10, altere conforme necessário
                 yield return new WaitForSeconds(0.5f); // Pequeno delay para ver cada ataque
             }
+            else
+            {
+                Debug.Log($"Enemy at index {i} is null or dead");
+            }
         }
+
+        
 
         EndTurn(); // Termina o turno dos inimigos após todos atacarem
     }
