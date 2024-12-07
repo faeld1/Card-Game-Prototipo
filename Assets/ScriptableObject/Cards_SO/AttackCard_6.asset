@@ -10,13 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 78818eacf30b6c1418cf592286290357, type: 3}
-  m_Name: AttackCard
+  m_Name: AttackCard_6
   m_EditorClassIdentifier: 
-  cardName: Attack
-  description: Attack 10
+  cardName: Attack6
+  description: Attack 60
   energyCost: 1
-  attackValue: 1
+  attackValue: 6
   defenseValue: 0
   cardSprite: {fileID: 504852825071024247, guid: c682c1f614cc85540af6b064fdf3d010, type: 3}
   cardType: 0
-  evolvedCard: {fileID: 11400000, guid: fde9b857dbfc46342bc308574b4cff27, type: 2}
+  evolvedCard: {fileID: 0}

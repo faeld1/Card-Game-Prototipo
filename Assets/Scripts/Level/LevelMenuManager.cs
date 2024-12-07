@@ -10,7 +10,7 @@ public class LevelMenuManager : MonoBehaviour
         SetupLevelButtons();
     }
 
-    private void SetupLevelButtons()
+    public void SetupLevelButtons()
     {
         for (int i = 0; i < levelButtons.Length; i++)
         {
@@ -18,7 +18,7 @@ public class LevelMenuManager : MonoBehaviour
             LevelData levelData = levelsData[i];
 
             bool isUnlocked = LevelManager.Instance.IsLevelUnlocked(levelData.levelNumber);
-            Debug.Log($"Configuring Level {levelData.levelNumber}: Unlocked = {isUnlocked}");
+           // Debug.Log($"Configuring Level {levelData.levelNumber}: Unlocked = {isUnlocked}");
 
             levelButtons[i].interactable = isUnlocked;
 

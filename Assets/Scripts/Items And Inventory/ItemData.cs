@@ -2,7 +2,9 @@ using UnityEngine;
 
 public enum ItemType
 {
+    Gold,
     Bless,
+    BlessDust,
     Keys,
     Creation,
     Fragment

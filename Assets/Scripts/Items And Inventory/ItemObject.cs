@@ -7,6 +7,7 @@ public class ItemObject : MonoBehaviour
    [SerializeField] private Rigidbody2D rb;
 
     [SerializeField] private ItemData itemData;
+    [SerializeField] private int amount = 1;
 
     private void Start()
     {
@@ -24,9 +25,10 @@ public class ItemObject : MonoBehaviour
         gameObject.name = "Item Object - " + itemData.name;
     }
 
-    public void SetupItem(ItemData _itemData, Vector2 _velocity)
+    public void SetupItem(ItemData _itemData, Vector2 _velocity, int _amount = 1)
     {
         itemData = _itemData;
+        amount = _amount;
         rb.linearVelocity = _velocity;
 
         SetupVisuals();
@@ -36,7 +38,7 @@ public class ItemObject : MonoBehaviour
     {
         if(collision.CompareTag("Bag"))
         {
-            Inventory.instance.AddItem(itemData);
+            Inventory.instance.AddItem(itemData,amount);
             Destroy(gameObject);
         }
     }

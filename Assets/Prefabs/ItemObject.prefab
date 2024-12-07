@@ -178,3 +178,4 @@ MonoBehaviour:
   sr: {fileID: 4797956255238942674}
   rb: {fileID: 1771519724486672626}
   itemData: {fileID: 0}
+  amount: 1

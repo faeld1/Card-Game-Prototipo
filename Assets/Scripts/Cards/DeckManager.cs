@@ -13,7 +13,7 @@ public class DeckManager : MonoBehaviour
     public static DeckManager instance;
 
     public List<CardData> mainDeck;
-    private List<CardData> discardPile = new List<CardData>();
+   [SerializeField] private List<CardData> discardPile = new List<CardData>();
     public List<CardData> hand = new List<CardData>();
     public int handSize = 3;
 
@@ -55,6 +55,7 @@ public class DeckManager : MonoBehaviour
 
         hiddenPosition = originalHandContainerPosition + new Vector2(0, -400);
 
+        mainDeck = new List<CardData>(LevelManager.Instance.mainDeck);
         ShuffleDeck();
         DrawInitialHand();
         UpdateUI();
@@ -230,5 +231,11 @@ public class DeckManager : MonoBehaviour
                     dragHandler.cardData = null;
             }
         }
+    }
+
+    public void RemoveTemporaryCards(List<CardData> temporaryCards)
+    {
+        mainDeck.RemoveAll(card => temporaryCards.Contains(card));
+        Debug.Log("Cartas temporárias removidas do baralho.");
     }
 }

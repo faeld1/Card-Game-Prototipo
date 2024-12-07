@@ -4,6 +4,11 @@ using UnityEngine.UI;
 
 public class CraftingSystem : MonoBehaviour
 {
+    [Header("Items")]
+    public ItemData blessDustItem;
+    public ItemData creationsItem;
+
+    [Header("UI Elements")]
     public TextMeshProUGUI blessDustText;
     public TextMeshProUGUI creationsText;
     public TMP_InputField inputAmount;
@@ -20,15 +25,24 @@ public class CraftingSystem : MonoBehaviour
 
     private void UpdateUI()
     {
-        blessDustText.text = "Pó de Bless: " + Inventory.instance.blessDust;
-        creationsText.text = "Creations: " + Inventory.instance.creations;
+        var blessDust = Inventory.instance.GetItemByData(blessDustItem);
+        var creations = Inventory.instance.GetItemByData(creationsItem);
+
+        blessDustText.text = "Pó de Bless: " + (blessDust != null ? blessDust.stackSize : 0);
+        creationsText.text = "Creations: " + (creations != null ? creations.stackSize : 0);
+
         Inventory.instance.UpdateSlotUI();
     }
 
     private void FillMaxAmount()
     {
-        int maxCraftableAmount = (Inventory.instance.blessDust / 10) * 10;
-        inputAmount.text = maxCraftableAmount.ToString();
+        var blessDust = Inventory.instance.GetItemByData(blessDustItem);
+
+        if (blessDust != null)
+        {
+            int maxCraftableAmount = (blessDust.stackSize / 10) * 10;
+            inputAmount.text = maxCraftableAmount.ToString();
+        }
     }
 
     // Realiza o craft de creations
@@ -36,18 +50,29 @@ public class CraftingSystem : MonoBehaviour
     {
         if (int.TryParse(inputAmount.text, out int amountToUse))
         {
-            // Calcula o máximo múltiplo de 10 que pode ser usado
-            int craftableAmount = (amountToUse / 10) * 10;
-            if (craftableAmount > 0 && craftableAmount <= Inventory.instance.blessDust)
+            var blessDust = Inventory.instance.GetItemByData(blessDustItem);
+
+            if (blessDust != null)
             {
-                int creationsCrafted = craftableAmount / 10;
-                Inventory.instance.creations += creationsCrafted;
-                Inventory.instance.blessDust -= craftableAmount;
-                UpdateUI();
+                int craftableAmount = (amountToUse / 10) * 10;
+
+                if (craftableAmount > 0 && craftableAmount <= blessDust.stackSize)
+                {
+                    int creationsCrafted = craftableAmount / 10;
+
+                    Inventory.instance.RemoveItem(blessDustItem, craftableAmount);
+                    Inventory.instance.AddItem(creationsItem, creationsCrafted);
+
+                    UpdateUI();
+                }
+                else
+                {
+                    Debug.Log("Valor inválido ou maior do que o disponível.");
+                }
             }
             else
             {
-                Debug.Log("Valor inválido ou maior do que o disponível.");
+                Debug.Log("Pó de Bless não disponível.");
             }
         }
         else

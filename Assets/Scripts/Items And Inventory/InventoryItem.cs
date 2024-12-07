@@ -7,12 +7,24 @@ public class InventoryItem
 
     public int stackSize;
 
-    public InventoryItem(ItemData _newItemData)
+    public InventoryItem(ItemData _newItemData, int initialStack)
     {
         data = _newItemData;
-        AddStack();
+        stackSize = initialStack;
     }
 
-    public void AddStack() => stackSize++;
-    public void RemoveStack() => stackSize--;
+    public void AddStack(int amount)
+    {
+        stackSize += amount;
+        Debug.Log($"Stack atualizado: {data.name}, Novo tamanho do stack: {stackSize}");
+    }
+
+    public void RemoveStack(int amount)
+    {
+        stackSize -= amount;
+        if (stackSize < 0)
+        {
+            stackSize = 0; // Previne que o stack fique negativo
+        }
+    }
 }

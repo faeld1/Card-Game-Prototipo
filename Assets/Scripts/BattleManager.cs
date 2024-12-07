@@ -94,12 +94,18 @@ public class BattleManager : MonoBehaviour
 
     public void VerifyPlayerIsAlive()
     {
-        if(playerStats.player.CurrentEnemyTarget == null || playerStats.currentHealth <= 0)
+        if (gameOverOnce == 1) // Garante que o método só será executado uma vez
         {
-            if(gameOverOnce == 1)
+            if (playerStats.currentHealth <= 0) // Derrota
             {
-            UI_Manager.instance.ShowEndGame();
-            Debug.Log("Verify do BattleManager");
+                Debug.Log("Player foi derrotado.");
+                gameOverOnce--;
+                LevelManager.Instance.ReturnToMenu(); // Vai direto para o menu principal em caso de derrota
+            }
+            else if (playerStats.player.CurrentEnemyTarget == null) // Vitória no último subnível
+            {
+                Debug.Log("Player venceu o último subnível.");
+                LevelManager.Instance.AdavanceSubLevel(); // Já lida com o retorno ao menu
                 gameOverOnce--;
             }
         }

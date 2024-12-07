@@ -231,6 +231,7 @@ MonoBehaviour:
   possibleDrop:
   - {fileID: 11400000, guid: 117ee0a4cbf32c349bc572923391b6a4, type: 2}
   - {fileID: 11400000, guid: 67bfeea3ec85c8b43aa7a368e6704f81, type: 2}
+  - {fileID: 11400000, guid: dd45759fd20ba8440842b1ec84cbef04, type: 2}
 --- !u!1 &7783094400374824331
 GameObject:
   m_ObjectHideFlags: 0

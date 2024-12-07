@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -8,6 +9,12 @@ public class LevelManager : MonoBehaviour
 
     public LevelData currentLevel;
     public int currentSubLevelIndex = 0; // subnivel atual
+    [SerializeField] private int subLevelTimes = 5;
+
+    //Cartas para serem enviadas para o MainDeck da proxima rodada
+    public List<CardData> mainDeck = new List<CardData>(); // Baralho principal do jogador
+
+    private Dictionary<CardData, CardData> evolvedCards = new Dictionary<CardData, CardData>();
 
     private void Awake()
     {
@@ -28,23 +35,36 @@ public class LevelManager : MonoBehaviour
         }
     }
 
+    private void Start()
+    {
+        //subLevelTimes -= 1;
+    }
+
     public void AdavanceSubLevel()
     {
         currentSubLevelIndex++;
 
-        if (currentSubLevelIndex >= 5) // Terminou todos os subníveis
+        if (currentSubLevelIndex > subLevelTimes) // Terminou todos os subníveis
         {
             Debug.Log("Level Complete!");
             SaveLevelProgress(currentLevel.levelNumber);
 
+            // Limpa cartas temporárias antes de retornar ao menu principal
+            ClearTemporaryCards();
+            RevertEvolutions();
             // Carrega o menu principal após concluir o último subnível
             SceneManager.LoadScene("MainMenu");
+
+            return;
         }
-        else
-        {
-            // Carrega a próxima cena de melhoria
-            SceneManager.LoadScene("UpgradeScene");
-        }
+
+        UI_Manager.instance.ShowEndGame();
+      
+    }
+
+    public void GoToUpgradeScene()
+    {
+        SceneManager.LoadScene("UpgradeScene");
     }
 
     public void ResetSubLevelProgress()
@@ -59,7 +79,7 @@ public class LevelManager : MonoBehaviour
 
         // Desbloqueia o próximo nível
         int nextLevel = levelNumber + 1;
-        if (nextLevel <= 5) // Substitua 5 pelo número total de níveis no jogo
+        if (nextLevel <= subLevelTimes) // Substitua 5 pelo número total de níveis no jogo
         {
             ES3.Save($"Level_{nextLevel}_Unlocked", true);
         }
@@ -87,4 +107,67 @@ public class LevelManager : MonoBehaviour
             Debug.LogWarning("Level is locked!");
         }
     }
+
+    //Relacionado a passagem das cartas ganhas.
+    public void AddCardToMainDeck(CardData card)
+    {
+        mainDeck.Add(card);
+    }
+
+    public void UpgradeCardInMainDeck(CardData originalCard, CardData upgradedCard)
+    {
+        int index = mainDeck.IndexOf(originalCard);
+        if (index >= 0)
+        {
+            mainDeck[index] = upgradedCard;
+        }
+        else
+        {
+            Debug.LogWarning($"Carta {originalCard.cardName} não encontrada no mainDeck.");
+        }
+    }
+
+    public void ClearTemporaryCards()
+    {
+        // Remove todas as cartas marcadas como temporárias
+        mainDeck.RemoveAll(card => card.isTemporary); // Supondo que `isTemporary` é um campo booleano em CardData
+        Debug.Log("Cartas temporárias removidas do mainDeck.");
+    }
+    public void TrackEvolution(CardData originalCard, CardData evolvedCard)
+    {
+        if (!evolvedCards.ContainsKey(originalCard))
+        {
+            evolvedCards.Add(originalCard, evolvedCard);
+            Debug.Log($"Evolução rastreada: {originalCard.cardName} > {evolvedCard.cardName}");
+        }
+    }
+    public void RevertEvolutions()
+    {
+        foreach (var pair in evolvedCards)
+        {
+            CardData evolvedCard = pair.Value;
+            CardData originalCard = pair.Key;
+
+            // Substituir a carta evoluída pela original no mainDeck
+            int index = mainDeck.IndexOf(evolvedCard);
+            if (index >= 0)
+            {
+                mainDeck[index] = originalCard;
+                Debug.Log($"Evolução revertida: {evolvedCard.cardName} > {originalCard.cardName}");
+            }
+        }
+
+        // Limpar o dicionário após reverter
+        evolvedCards.Clear();
+    }
+    public void ReturnToMenu()
+    {
+        // Limpa cartas temporárias e reverte evoluções antes de retornar ao menu
+        ClearTemporaryCards();
+        RevertEvolutions();
+
+        // Carrega o menu principal
+        SceneManager.LoadScene("MainMenu");
+    }
+    //
 }

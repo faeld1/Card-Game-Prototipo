@@ -8,19 +8,14 @@ public class Inventory : MonoBehaviour
     public List<ItemData> startingItems;
 
     public List<InventoryItem> inventoryItems;
-    public Dictionary<ItemData, InventoryItem> inventoryDirectionary;
+    public Dictionary<ItemData, InventoryItem> inventoryDictionary;
 
     [Header("Inventory UI")]
     [SerializeField] private Transform inventorySlotParent;
 
     private UI_ItemSlot[] inventoryItemSlot;
 
-    [Header("Itens Dropaveis/Craftaveis")]
-    public int bless;
-    public int creations;
-
-    public int blessDust;
-
+    private const string InventorySaveKey = "PlayerInventory";
 
     public Transform bagContainer;
 
@@ -36,57 +31,83 @@ public class Inventory : MonoBehaviour
         }
     }
 
+    private void Update()
+    {
+        ShowItemsQuant();
+    }
     private void Start()
     {
         inventoryItems = new List<InventoryItem>();
-        inventoryDirectionary = new Dictionary<ItemData, InventoryItem>();
+        inventoryDictionary = new Dictionary<ItemData, InventoryItem>();
 
-        inventoryItemSlot = inventorySlotParent.GetComponentsInChildren<UI_ItemSlot>();
 
         LoadInventoryData();
-        AddStartingItems();
+        inventoryItemSlot = inventorySlotParent.GetComponentsInChildren<UI_ItemSlot>();
+        UpdateSlotUI();
+        if(inventoryItems.Count == 0 )
+        {
+            AddStartingItems();
+        }
+        
     }
     private void AddStartingItems()
     {
-        for (int i = 0; i < startingItems.Count; i++)
+        foreach (var itemData in startingItems)
         {
-            if(startingItems[i] != null)
+            if (itemData != null && !inventoryDictionary.ContainsKey(itemData))
             {
-                AddItem(startingItems[i]);
-                RemoveItem(startingItems[i]);
+                AddItem(itemData, 0); // Adiciona os itens ao inventário com stack 0
             }
         }
     }
-    public void AddItem(ItemData _item)
+    public void AddItem(ItemData _item, int amount)
     {
-        if(inventoryDirectionary.TryGetValue(_item, out InventoryItem value))
+        if(inventoryDictionary.TryGetValue(_item, out InventoryItem value))
         {
-            value.AddStack();
-            if(_item.itemType == ItemType.Bless)
-                bless++;
-            else if(_item.itemType == ItemType.Creation)
-                creations++;
+            value.AddStack(amount);
+            Debug.Log($"Item atualizado: {_item.name}, Nova Quantidade: {value.stackSize}");
         }
         else
         {
-            InventoryItem newItem = new InventoryItem(_item);
+            // Cria um novo item com o stack inicial
+            InventoryItem newItem = new InventoryItem(_item, Mathf.Max(0, amount));
             inventoryItems.Add(newItem);
-            inventoryDirectionary.Add(_item, newItem);
+            inventoryDictionary.Add(_item, newItem);
         }
+
+        // Atualiza a lista para refletir o dicionário
+        inventoryItems = new List<InventoryItem>(inventoryDictionary.Values);
 
         SaveInventoryData();
 
         UpdateSlotUI();
     }
 
-    public void RemoveItem(ItemData _item)
+    private void ShowItemsQuant()
     {
-        if (inventoryDirectionary.TryGetValue(_item, out InventoryItem value))
+        if(Input.GetKeyDown(KeyCode.J))
         {
-            value.RemoveStack();
+            foreach (var item in inventoryItems)
+            {
+                Debug.Log($"Lista - ItemName: {item.data.name}, ItemQuant: {item.stackSize}");
+            }
+
+            foreach (var kvp in inventoryDictionary)
+            {
+                Debug.Log($"Dicionário - ItemName: {kvp.Key.name}, ItemQuant: {kvp.Value.stackSize}");
+            }
+        }
+    }
+
+    public void RemoveItem(ItemData _item, int amount)
+    {
+        if (inventoryDictionary.TryGetValue(_item, out InventoryItem value))
+        {
+            value.RemoveStack(amount);
         }
 
         SaveInventoryData();
+        UpdateSlotUI();
     }
 
     public void UpdateSlotUI()
@@ -97,16 +118,35 @@ public class Inventory : MonoBehaviour
         }
     }
 
+    public InventoryItem GetItemByData(ItemData itemData)
+    {
+        return inventoryDictionary.ContainsKey(itemData) ? inventoryDictionary[itemData] : null;
+    }
+
     private void SaveInventoryData()
     {
-        ES3.Save("Bless", bless);
-        ES3.Save("Creation", creations);
+        ES3.Save(InventorySaveKey + "_Dictionary", inventoryDictionary);
+        ES3.Save(InventorySaveKey + "_List", inventoryItems);
     }
 
     private void LoadInventoryData()
     {
-        bless = ES3.Load("Bless", defaultValue: 0);
-        creations = ES3.Load("Creation", defaultValue: 0);
+        Debug.Log("Carregando inventário...");
+        if (ES3.KeyExists(InventorySaveKey + "_List"))
+        {
+            inventoryItems = ES3.Load<List<InventoryItem>>(InventorySaveKey + "_List");
+            inventoryDictionary = new Dictionary<ItemData, InventoryItem>();
+            foreach (var item in inventoryItems)
+            {
+                inventoryDictionary.Add(item.data, item);
+                Debug.Log($"Carregado Item: {item.data.name}, Quantidade: {item.stackSize}");
+            }
+        }
+        else
+        {
+            inventoryItems = new List<InventoryItem>();
+            inventoryDictionary = new Dictionary<ItemData, InventoryItem>();
+        }
     }
 
 }

@@ -11,6 +11,8 @@ public class CardData : ScriptableObject
     public Sprite cardSprite;
     public CardType cardType;
 
+    public CardData evolvedCard; // Carta para a qual essa carta evolui (pode ser null)
+    public bool isTemporary; // Indica se a carta é temporária
 }
 
 public enum CardType

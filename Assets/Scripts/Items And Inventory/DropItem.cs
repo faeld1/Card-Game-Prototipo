@@ -29,16 +29,18 @@ public class DropItem : MonoBehaviour
             ItemData randomItem = dropList[Random.Range(0, dropList.Count)];
 
             dropList.Remove(randomItem);
-            ItemDrop(randomItem);
+
+            int randomAmount = Random.Range(1, 5);
+            ItemDrop(randomItem,randomAmount);
         }
     }
 
-    public void ItemDrop(ItemData _itemData)
+    public void ItemDrop(ItemData _itemData, int amount)
     {
         GameObject newDrop = Instantiate(dropPrefab,transform.position,Quaternion.identity);
 
         Vector2 randomVelocity = new Vector2(Random.Range(-5, 5), Random.Range(4, 6));
 
-        newDrop.GetComponent<ItemObject>().SetupItem(_itemData,randomVelocity);
+        newDrop.GetComponent<ItemObject>().SetupItem(_itemData,randomVelocity,amount);
     }
 }

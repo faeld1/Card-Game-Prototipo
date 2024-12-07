@@ -62,7 +62,7 @@ public class LevelController : MonoBehaviour
     /// Chama este método quando o jogador vence o subnível atual.
     public void OnSubLevelWon()
     {
-        LevelManager.Instance.AdavanceSubLevel();
+        LevelManager.Instance.GoToUpgradeScene();
     }
 
 
@@ -70,6 +70,8 @@ public class LevelController : MonoBehaviour
     public void OnSubLevelLost()
     {
         Debug.Log("SubLevel Lost! Restarting...");
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name); // Reinicia a cena atual
+        SceneManager.LoadScene("MainMenu");
+
+        //SceneManager.LoadScene(SceneManager.GetActiveScene().name); // Reinicia a cena atual
     }
 }

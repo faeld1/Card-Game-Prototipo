@@ -19,3 +19,4 @@ MonoBehaviour:
   defenseValue: 0
   cardSprite: {fileID: 504852825071024247, guid: c682c1f614cc85540af6b064fdf3d010, type: 3}
   cardType: 0
+  evolvedCard: {fileID: 11400000, guid: a6ddde42edd55c04a90627efc3373e79, type: 2}
