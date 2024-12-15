@@ -14,5 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemName: Creation
   itemIcon: {fileID: -1185150667, guid: a9ca9a41598dd2e44b125928045c518f, type: 3}
-  itemType: 2
-  dropChance: 50.5
+  itemType: 4
+  craftingMaterials:
+  - data: {fileID: 11400000, guid: e360a80f144a5b64b928979fb73cfbb2, type: 2}
+    stackSize: 3
+  - data: {fileID: 11400000, guid: 117ee0a4cbf32c349bc572923391b6a4, type: 2}
+    stackSize: 1
+  dropChance: 12.3

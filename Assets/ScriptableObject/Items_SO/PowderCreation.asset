@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 243f845ddf264934ea2f7e29c9c74549, type: 3}
-  m_Name: PowderBless
+  m_Name: PowderCreation
   m_EditorClassIdentifier: 
-  itemName: PowderBless
-  itemIcon: {fileID: -1333842718, guid: a9ca9a41598dd2e44b125928045c518f, type: 3}
+  itemName: PowderCreation
+  itemIcon: {fileID: 1456481809, guid: a9ca9a41598dd2e44b125928045c518f, type: 3}
   itemType: 2
   craftingMaterials: []
-  dropChance: 74.3
+  dropChance: 72

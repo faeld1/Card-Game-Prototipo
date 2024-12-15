@@ -14,5 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemName: Bless
   itemIcon: {fileID: -1523476312, guid: a9ca9a41598dd2e44b125928045c518f, type: 3}
-  itemType: 0
-  dropChance: 47.7
+  itemType: 1
+  craftingMaterials:
+  - data: {fileID: 11400000, guid: dd45759fd20ba8440842b1ec84cbef04, type: 2}
+    stackSize: 2
+  dropChance: 10

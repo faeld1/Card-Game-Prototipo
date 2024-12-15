@@ -31,10 +31,6 @@ public class Inventory : MonoBehaviour
         }
     }
 
-    private void Update()
-    {
-        ShowItemsQuant();
-    }
     private void Start()
     {
         inventoryItems = new List<InventoryItem>();
@@ -83,27 +79,27 @@ public class Inventory : MonoBehaviour
         UpdateSlotUI();
     }
 
-    private void ShowItemsQuant()
-    {
-        if(Input.GetKeyDown(KeyCode.J))
-        {
-            foreach (var item in inventoryItems)
-            {
-                Debug.Log($"Lista - ItemName: {item.data.name}, ItemQuant: {item.stackSize}");
-            }
-
-            foreach (var kvp in inventoryDictionary)
-            {
-                Debug.Log($"Dicionário - ItemName: {kvp.Key.name}, ItemQuant: {kvp.Value.stackSize}");
-            }
-        }
-    }
-
     public void RemoveItem(ItemData _item, int amount)
     {
         if (inventoryDictionary.TryGetValue(_item, out InventoryItem value))
         {
-            value.RemoveStack(amount);
+            // Verifica se o item tem stack suficiente
+            if (value.stackSize >= amount)
+            {
+                value.RemoveStack(amount);  // Remove a quantidade necessária
+                if (value.stackSize <= 0)
+                {
+                    value.stackSize = 0;
+                }
+            }
+            else
+            {
+                Debug.LogWarning("Quantidade de item insuficiente para remoção.");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("Item não encontrado no inventário.");
         }
 
         SaveInventoryData();
@@ -118,9 +114,62 @@ public class Inventory : MonoBehaviour
         }
     }
 
+    public bool CanCraft(ItemData itemToCraft, int _amount)
+    {
+        List<InventoryItem> materialsToRemove = new List<InventoryItem>();
+
+        // Itera sobre os materiais necessários
+        foreach (var requiredMaterial in itemToCraft.craftingMaterials)
+        {
+            // Verifica se o material está disponível no inventário
+            if (inventoryDictionary.TryGetValue(requiredMaterial.data, out InventoryItem inventoryItem))
+            {
+                // Calcula a quantidade total necessária para o crafting
+                int totalRequired = requiredMaterial.stackSize * _amount;
+
+                // Verifica se a quantidade disponível é suficiente
+                if (inventoryItem.stackSize < totalRequired)
+                {
+                    Debug.Log($"Não há materiais suficientes para {requiredMaterial.data.itemName}");
+                    return false; // Não há quantidade suficiente
+                }
+                else
+                {
+                    // Adiciona à lista de materiais a serem consumidos
+                    materialsToRemove.Add(inventoryItem);
+                }
+            }
+            else
+            {
+                Debug.Log($"Material {requiredMaterial.data.itemName} não encontrado no inventário.");
+                return false; // Material não encontrado
+            }
+        }
+
+        // Se todos os materiais forem suficientes, consome-os e adiciona o item ao inventário
+        foreach (var requiredMaterial in itemToCraft.craftingMaterials)
+        {
+            int totalRequired = requiredMaterial.stackSize * _amount;
+            RemoveItem(requiredMaterial.data, totalRequired); // Remove apenas o necessário
+        }
+        AddItem(itemToCraft,_amount);
+
+        Debug.Log($"Item {itemToCraft.itemName} foi fabricado com sucesso!");
+
+        return true;
+    }
+
     public InventoryItem GetItemByData(ItemData itemData)
     {
         return inventoryDictionary.ContainsKey(itemData) ? inventoryDictionary[itemData] : null;
+    }
+    public int GetItemCount(ItemData item)
+    {
+        if (inventoryDictionary.TryGetValue(item, out InventoryItem inventoryItem))
+        {
+            return inventoryItem.stackSize;
+        }
+        return 0;
     }
 
     private void SaveInventoryData()
