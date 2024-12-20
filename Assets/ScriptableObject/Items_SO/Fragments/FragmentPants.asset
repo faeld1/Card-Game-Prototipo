@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 63235f5d0b355ef4d8fb506c6b1c58b3, type: 3}
+  m_Name: FragmentPants
+  m_EditorClassIdentifier: 
+  itemName: Fragment Pants
+  itemIcon: {fileID: 21300000, guid: f97df8e008d69ce4099884718fba1d6e, type: 3}
+  itemType: 5
+  craftingMaterials: []
+  dropChance: 15.5
+  fragmentType: 2

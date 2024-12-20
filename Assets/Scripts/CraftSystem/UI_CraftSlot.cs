@@ -6,7 +6,7 @@ public class UI_CraftSlot : MonoBehaviour, IPointerClickHandler
     [SerializeField] private ItemData itemData;
 
     public delegate void OnCraftSlotSelected(ItemData item);
-    public static event OnCraftSlotSelected CraftSlotSelected;
+    //public static event OnCraftSlotSelected CraftSlotSelected;
 
     public void SetupCraftSlot(ItemData item)
     {

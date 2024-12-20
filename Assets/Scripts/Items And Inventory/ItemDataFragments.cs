@@ -2,12 +2,13 @@ using UnityEngine;
 
 public enum FragmentType
 {
-    Common,
-    Uncommon,
-    Rare,
-    Epic,
-    Legendary,
-    Divine
+    Gloves,
+    Boots,
+    Pants,
+    Armor,
+    Helmet,
+    Weapon,
+    Wings
 }
 
 

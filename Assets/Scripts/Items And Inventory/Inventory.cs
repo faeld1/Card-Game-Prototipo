@@ -44,6 +44,7 @@ public class Inventory : MonoBehaviour
         {
             AddStartingItems();
         }
+
         
     }
     private void AddStartingItems()
@@ -104,6 +105,14 @@ public class Inventory : MonoBehaviour
 
         SaveInventoryData();
         UpdateSlotUI();
+    }
+    public bool CanRemoveItem(ItemData _item, int amount)
+    {
+        if (inventoryDictionary.TryGetValue(_item, out InventoryItem value))
+        {
+            return value.stackSize >= amount;
+        }
+        return false; // Item não encontrado ou quantidade insuficiente
     }
 
     public void UpdateSlotUI()

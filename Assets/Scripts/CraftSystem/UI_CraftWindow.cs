@@ -27,7 +27,7 @@ public class UI_CraftWindow : MonoBehaviour
             Destroy(gameObject);
     }
 
-    private void OnEnable()
+   /* private void OnEnable()
     {
         UI_CraftSlot.CraftSlotSelected += UpdateSelectedItem;
     }
@@ -35,7 +35,7 @@ public class UI_CraftWindow : MonoBehaviour
     private void OnDisable()
     {
         UI_CraftSlot.CraftSlotSelected -= UpdateSelectedItem;
-    }
+    }*/
 
     public void SelectItem(ItemData item)
     {
