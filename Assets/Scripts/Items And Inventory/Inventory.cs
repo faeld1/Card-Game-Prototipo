@@ -119,7 +119,15 @@ public class Inventory : MonoBehaviour
     {
         for(int i = 0; i < inventoryItems.Count; i++)
         {
-            inventoryItemSlot[i].UpdateSlot(inventoryItems[i]);
+            if(i < inventoryItemSlot.Length)
+            {
+                inventoryItemSlot[i].UpdateSlot(inventoryItems[i]);
+            }
+            else
+            {
+                Debug.LogWarning("Número de itens no inventário excede o número de slots disponíveis.");
+                break;
+            }       
         }
     }
 
@@ -197,7 +205,7 @@ public class Inventory : MonoBehaviour
             foreach (var item in inventoryItems)
             {
                 inventoryDictionary.Add(item.data, item);
-                Debug.Log($"Carregado Item: {item.data.name}, Quantidade: {item.stackSize}");
+                //Debug.Log($"Carregado Item: {item.data.name}, Quantidade: {item.stackSize}");
             }
         }
         else

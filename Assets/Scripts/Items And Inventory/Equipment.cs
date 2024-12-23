@@ -22,11 +22,12 @@ public class Equipment
         }
     }
 
-    private void UpgradeRarity()
+    public void UpgradeRarity()
     {
         if (rarity < Rarity.Divine)
         {
             rarity++;
+            Debug.Log($"Raridade evoluiu para {rarity}!");
         }
     }
 }

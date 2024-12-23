@@ -47,10 +47,16 @@ public class UI_Manager : MonoBehaviour
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
-    public void ShowEndGame()
+    private IEnumerator ShowEndGameDelay()
     {
+        yield return new WaitForSeconds(1f);
         MoveEndGame(ShowEndGameContainerPosition);
         endGameContainer.gameObject.SetActive(true);
+    }
+
+    public void ShowEndGame()
+    {
+        StartCoroutine(ShowEndGameDelay());
     }
 
     public void HideEndGame()

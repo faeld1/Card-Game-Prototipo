@@ -38,13 +38,13 @@ public class ItemObject : MonoBehaviour
     {
         if(collision.CompareTag("Bag"))
         {
-            Inventory.instance.AddItem(itemData,amount);
             Destroy(gameObject);
         }
     }
 
     private IEnumerator MoveToBag()
     {
+        Inventory.instance.AddItem(itemData, amount);
         yield return new WaitForSeconds(0.35f);
 
         rb.bodyType = RigidbodyType2D.Kinematic;

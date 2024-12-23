@@ -29,7 +29,15 @@ public class UI_EquipmentManager : MonoBehaviour
 
         for (int i = 0; i < _inventory.inventoryItems.Count; i++)
         {
-            inventoryItemSlot[i].UpdateSlot(_inventory.inventoryItems[i]);
+            if (i < inventoryItemSlot.Length)
+            {
+                inventoryItemSlot[i].UpdateSlot(_inventory.inventoryItems[i]);
+            }
+            else
+            {
+                Debug.LogWarning("Número de itens no inventário excede o número de slots disponíveis.");
+                break;
+            }
         }
     }
     public void RefreshUI()

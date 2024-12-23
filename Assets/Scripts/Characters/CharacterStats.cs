@@ -12,6 +12,7 @@ public class CharacterStats : MonoBehaviour
     public Stats critPower;
 
     public Stats maxHealth;
+    public Stats evasion;
 
     public int level;
     public int energy = 1;

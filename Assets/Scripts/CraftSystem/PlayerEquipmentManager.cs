@@ -13,6 +13,12 @@ public class PlayerEquipmentManager : MonoBehaviour
     public ItemData blessItem; // Item usado para upgrade
     public ItemData[] equipmentFragments; // Fragmentos usados para aumentar as estrelas
 
+    [Header("Cores por Raridade")]
+    private Dictionary<Rarity, Color> rarityColorDictionary;
+
+    [Header("Configuração de Cores no Inspector")]
+    public List<RarityColor> rarityColorConfig; // Para configurar no inspector
+
     private const string SaveKey = "PlayerEquipmentData";
 
     private UI_EquipmentManager equipmentManager;
@@ -32,12 +38,13 @@ public class PlayerEquipmentManager : MonoBehaviour
         {
            // playerEquipment.Clear();
             LoadEquipment();
-            Debug.Log("Equip Level Loaded");
         }
         else
         {
             InitializeEquipment();
         }
+
+        InitializeRarityColors();
     }
 
     private void Start()
@@ -48,6 +55,7 @@ public class PlayerEquipmentManager : MonoBehaviour
         if (equipmentManager != null)
         {
             equipmentManager.RefreshUI(); // Atualiza a interface após garantir que os dados estão carregados
+            ProcessFragments(); // Processa os fragmentos ao carregar o menu
         }
         else
         {
@@ -138,6 +146,78 @@ public class PlayerEquipmentManager : MonoBehaviour
         return baseCost + (level - 1) * costIncreasePerLevel;
     }
 
+    public void ProcessFragments()
+    {
+        foreach (var equipment in playerEquipment)
+        {
+            // Busca os fragmentos correspondentes para o tipo do equipamento
+            ItemData fragment = GetFragmentForEquipment(equipment.equipmentType);
+
+            if (fragment == null)
+            {
+                Debug.LogWarning($"Nenhum fragmento encontrado para {equipment.equipmentType}");
+                continue;
+            }
+
+            // Enquanto houver fragmentos no inventário e o equipamento não tiver max estrelas
+            while (Inventory.instance.GetItemCount(fragment) > 0)
+            {
+
+                Inventory.instance.RemoveItem(fragment, 1);
+                equipment.AddStars(1);
+
+                // Se alcançar o máximo de estrelas, aumenta a raridade
+                if (equipment.stars >= 5)
+                {
+                    equipment.UpgradeRarity();
+                }
+
+                // Salva e atualiza a UI após cada alteração
+                SaveEquipment();
+                equipmentManager.RefreshUI();
+            }
+        }
+    }
+
+    private ItemData GetFragmentForEquipment(EquipmentType equipmentType)
+    {
+        foreach (var item in equipmentFragments)
+        {
+            if (item is ItemDataFragments fragment)
+            {
+                
+                if (fragment.fragmentType.ToString() == equipmentType.ToString())
+                {
+                    return fragment;
+                }
+            }
+        }
+        return null;
+    }
+    //COLORS
+    private void InitializeRarityColors()
+    {
+        rarityColorDictionary = new Dictionary<Rarity, Color>();
+
+        foreach (var rarityColor in rarityColorConfig)
+        {
+            if (!rarityColorDictionary.ContainsKey(rarityColor.rarity))
+            {
+                rarityColorDictionary.Add(rarityColor.rarity, rarityColor.color);
+            }
+        }
+    }
+
+    public Color GetColorForRarity(Rarity rarity)
+    {
+        if (rarityColorDictionary.TryGetValue(rarity, out Color color))
+        {
+            return color;
+        }
+
+        return Color.white; // Retorna branco como padrão se a raridade não estiver configurada
+    }
+
     // Salva as informações dos equipamentos usando Easy Save 3
     public void SaveEquipment()
     {
@@ -151,4 +231,11 @@ public class PlayerEquipmentManager : MonoBehaviour
         playerEquipment = ES3.Load(SaveKey, new List<Equipment>());
         Debug.Log("Equipamentos carregados com sucesso!");
     }
+}
+
+[System.Serializable]
+public class RarityColor
+{
+    public Rarity rarity;
+    public Color color;
 }

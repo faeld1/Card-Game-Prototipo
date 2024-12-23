@@ -30,11 +30,16 @@ public class UI_EquipmentSlot : MonoBehaviour
         if (assignedEquipment != null)
         {
             // Atualiza o ícone
-           // equipmentIcon.sprite = assignedEquipment.equipmentIcon ?? null;
+            // equipmentIcon.sprite = assignedEquipment.equipmentIcon ?? null;
+            // Altera apenas a cor do sprite do ícone com base na raridade
+            equipmentIcon.color = PlayerEquipmentManager.Instance.GetColorForRarity(assignedEquipment.rarity);
 
             // Atualiza o texto
             levelText.text = $"Level: {assignedEquipment.level}";
             rarityText.text = assignedEquipment.rarity.ToString();
+
+            // Aplica a cor baseada na raridade
+            rarityText.color = PlayerEquipmentManager.Instance.GetColorForRarity(assignedEquipment.rarity);
 
             // Atualiza o número de estrelas
             UpdateStars(assignedEquipment.stars);
@@ -63,8 +68,6 @@ public class UI_EquipmentSlot : MonoBehaviour
 
     public void SetupSlot(Equipment equipment)
     {
-
-        Debug.Log($"SetupSlot chamado para {equipment?.equipmentName ?? "N/A"}");
         assignedEquipment = equipment;
 
         if (equipment != null)
@@ -80,6 +83,7 @@ public class UI_EquipmentSlot : MonoBehaviour
             upgradeButton.interactable = true;
             upgradeButton.onClick.RemoveAllListeners(); // Remove listeners antigos para evitar duplicação
             upgradeButton.onClick.AddListener(() => OnUpgradeButtonPressed(equipment));
+            RefreshSlot();
         }
         else
         {
