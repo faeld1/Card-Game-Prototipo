@@ -32,6 +32,7 @@ public class CraftingSystem : MonoBehaviour
         creationsText.text = "Creations: " + (creations != null ? creations.stackSize : 0);
 
         Inventory.instance.UpdateSlotUI();
+        PlayerEquipmentManager.Instance.equipmentManager.UpdateInventory();
     }
 
     private void FillMaxAmount()

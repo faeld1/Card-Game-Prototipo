@@ -194,6 +194,7 @@ public class UI_CraftWindow : MonoBehaviour
         {
             Debug.Log($"{currentItem.itemName} fabricado com sucesso!");
             ShowItemDetails(currentItem); // Atualiza os detalhes após o craft
+            PlayerEquipmentManager.Instance.equipmentManager.UpdateInventory();
         }
     }
 }

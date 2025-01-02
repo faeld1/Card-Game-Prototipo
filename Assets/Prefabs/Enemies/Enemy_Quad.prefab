@@ -183,7 +183,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damage:
-    baseValue: 2
+    baseValue: 25
     modifiers: 
   critChance:
     baseValue: 0
@@ -193,6 +193,12 @@ MonoBehaviour:
     modifiers: 
   maxHealth:
     baseValue: 100
+    modifiers: 
+  evasion:
+    baseValue: 10
+    modifiers: 
+  armor:
+    baseValue: 0
     modifiers: 
   level: 1
   energy: 1

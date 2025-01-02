@@ -9,6 +9,8 @@ public class UI_EquipmentSlot : MonoBehaviour
     public Image equipmentIcon;
     public TextMeshProUGUI levelText;
     public TextMeshProUGUI rarityText;
+    public TextMeshProUGUI upgradeCostText;
+    public TextMeshProUGUI upgradeChanceText;
     public Transform starContainer; // Container para exibir estrelas
     public GameObject starPrefab; // Prefab para uma estrela
     public Button upgradeButton;
@@ -18,25 +20,29 @@ public class UI_EquipmentSlot : MonoBehaviour
 
     private Equipment assignedEquipment; // Referência ao equipamento atual
 
-    private void Start()
-    {
-        
-    }
-
     public void RefreshSlot()
     {
         assignedEquipment = PlayerEquipmentManager.Instance.GetEquipmentByType(equipmentType);
 
         if (assignedEquipment != null)
         {
-            // Atualiza o ícone
-            // equipmentIcon.sprite = assignedEquipment.equipmentIcon ?? null;
+
             // Altera apenas a cor do sprite do ícone com base na raridade
             equipmentIcon.color = PlayerEquipmentManager.Instance.GetColorForRarity(assignedEquipment.rarity);
 
             // Atualiza o texto
             levelText.text = $"Level: {assignedEquipment.level}";
             rarityText.text = assignedEquipment.rarity.ToString();
+            // Calcula o custo e obtém a quantidade total de Bless
+            int upgradeCost = PlayerEquipmentManager.Instance.CalculateBlessCost(assignedEquipment.level);
+            int totalBless = Inventory.instance.GetItemCount(PlayerEquipmentManager.Instance.blessItem);
+
+            // Atualiza o texto de custo de upgrade
+            if(upgradeCostText != null)
+                upgradeCostText.text = $"Custo: {upgradeCost}/{totalBless}";
+
+            if(upgradeChanceText != null)
+                upgradeChanceText.text = assignedEquipment.GetUpgradeChanceFormatted(); // Mostra a % de sucesso
 
             // Aplica a cor baseada na raridade
             rarityText.color = PlayerEquipmentManager.Instance.GetColorForRarity(assignedEquipment.rarity);
@@ -61,6 +67,7 @@ public class UI_EquipmentSlot : MonoBehaviour
         equipmentIcon.sprite = null;
         levelText.text = "Level: -";
         rarityText.text = "None";
+        upgradeCostText.text = "Custo: -";
         UpdateStars(0);
         upgradeButton.interactable = false;
         upgradeButton.onClick.RemoveAllListeners();

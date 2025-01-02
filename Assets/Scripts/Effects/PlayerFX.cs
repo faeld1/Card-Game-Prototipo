@@ -28,6 +28,12 @@ public class PlayerFX : MonoBehaviour
             TextMeshProUGUI damageText = newInstance.GetComponent<DamageText>().damageText;
             damageText.text = damage.ToString();
 
+            if (damage == 0)
+            {
+                damageText.text = "Miss";
+                damageText.color = Color.white;
+            }
+
             newInstance.transform.position = textDamageSpawnPosition.position + randomPosition;
             newInstance.SetActive(true);
         }

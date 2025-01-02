@@ -31,6 +31,13 @@ public class EnemyFX : MonoBehaviour
             if(crit)
                 damageText.color = Color.red;
 
+            if(damage == 0)
+            {
+                damageText.text = "Miss";
+                damageText.color = Color.white;
+            }
+
+
             newInstance.transform.position = textDamageSpawnPosition.position+randomPosition;
             newInstance.SetActive(true);
 

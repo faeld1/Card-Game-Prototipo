@@ -6,14 +6,29 @@ public class PlayerStats : CharacterStats
 {
     public static Action<PlayerStats, int> OnPlayerHit;
 
+    public static PlayerStats instance;
+
     [SerializeField] private int currentXP;
     [SerializeField] private int xpToNextLevel;
     private float xpGrowthFactor = 1.25f;
 
+    private void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else
+        {
+            Destroy(this);
+        }
+
+    }
+
     protected override void Start()
     {
-        base.Start();
         LoadFragmentData();
+        base.Start();
         xpToNextLevel = Mathf.RoundToInt(10 * Mathf.Pow(xpGrowthFactor, level - 1));
     }
 
@@ -52,6 +67,7 @@ public class PlayerStats : CharacterStats
         xpToNextLevel = Mathf.RoundToInt(xpToNextLevel * xpGrowthFactor);  // Aumenta o XP necessário com base no fator de crescimento
         Debug.Log("Level Up! Novo nível: " + level);
     }
+
 
     private void OnEnable()
     {

@@ -20,6 +20,12 @@ public class Stats
         return finalValue;
     }
 
+    public int GetDefaultValue()
+    {
+        int value = baseValue;
+
+        return value;
+    }
     public void AddModifiers(int _modifier)
     {
         modifiers.Add(_modifier);

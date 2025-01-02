@@ -16,6 +16,8 @@ MonoBehaviour:
   description: Defense 20
   energyCost: 1
   attackValue: 0
-  defenseValue: 20
+  defenseValue: 2
   cardSprite: {fileID: -5338582840708640988, guid: 2fc892f1812ee0846986ab2f1e90e7ed, type: 3}
   cardType: 1
+  evolvedCard: {fileID: 0}
+  isTemporary: 0

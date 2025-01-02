@@ -33,18 +33,18 @@ public class UI_Manager : MonoBehaviour
         HideEndGame();
     }
 
-    public void RestartScene()
+    public void ExitScene()
     {
         //HideEndGame();
         
-        StartCoroutine(RestartAfterDelay());
+        StartCoroutine(ExitAfterDelay());
         //criar depois uma solução melhor para isso aqui:   
     }
 
-    private IEnumerator RestartAfterDelay()
+    private IEnumerator ExitAfterDelay()
     {
         yield return new WaitForSeconds(0.01f);
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        SceneManager.LoadScene("MainMenu");
     }
 
     private IEnumerator ShowEndGameDelay()

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerEquipmentManager : MonoBehaviour
 {
@@ -7,10 +8,12 @@ public class PlayerEquipmentManager : MonoBehaviour
 
     [Header("Equipments")]
     public List<Equipment> playerEquipment; // Lista com todos os equipamentos do jogador
+    public List<EquipmentData> defaultEquipmentData; // Lista de equipamentos base
     public Sprite defaultEquipmentIcon; // Ícone padrão para equipamentos sem configuração
 
     [Header("Resources")]
     public ItemData blessItem; // Item usado para upgrade
+    public ItemData powderBlessItem; // Item criado quando a evolução falha
     public ItemData[] equipmentFragments; // Fragmentos usados para aumentar as estrelas
 
     [Header("Cores por Raridade")]
@@ -21,7 +24,9 @@ public class PlayerEquipmentManager : MonoBehaviour
 
     private const string SaveKey = "PlayerEquipmentData";
 
-    private UI_EquipmentManager equipmentManager;
+    public UI_EquipmentManager equipmentManager;
+    private PlayerStats playerStats;
+    private EquipmentData equipmentData;
 
     private void Awake()
     {
@@ -43,24 +48,31 @@ public class PlayerEquipmentManager : MonoBehaviour
         {
             InitializeEquipment();
         }
-
-        InitializeRarityColors();
+            InitializeRarityColors();
+        
     }
 
     private void Start()
     {
-
+        playerStats = PlayerStats.instance;
         equipmentManager = GetComponent<UI_EquipmentManager>();
 
         if (equipmentManager != null)
         {
+            Debug.Log("Iniciando PlayerEquipmentManager...");
             equipmentManager.RefreshUI(); // Atualiza a interface após garantir que os dados estão carregados
-            ProcessFragments(); // Processa os fragmentos ao carregar o menu
+            if(IsInMenuScene())
+            {
+                ProcessFragments(); // Processa os fragmentos ao carregar o menu
+            }
+            ApplyModifiers();
         }
         else
         {
             Debug.LogWarning("UI_EquipmentManager não encontrado!");
         }
+
+        GetComponent<UI_CharacterStats>()?.UpdateStatsUI();
     }
 
     private void Update()
@@ -70,34 +82,61 @@ public class PlayerEquipmentManager : MonoBehaviour
             Inventory.instance.AddItem(blessItem,10);
             Debug.Log("Bless adicionado");
         }
+
+        if(Input.GetKeyDown(KeyCode.H))
+        {
+            Inventory.instance.AddItem(powderBlessItem, 10);
+            Debug.Log("PowderBless adicionado");
+        }
     }
 
     private void InitializeEquipment()
     {
         playerEquipment.Clear();
 
-        foreach (EquipmentType type in System.Enum.GetValues(typeof(EquipmentType)))
+        if (defaultEquipmentData == null || defaultEquipmentData.Count == 0)
         {
-            Equipment defaultEquipment = new Equipment
+            Debug.LogError("DefaultEquipmentData está vazio! Certifique-se de configurá-lo no Inspector.");
+            return;
+        }
+
+        // Cria equipamentos com base nos dados padrão
+        foreach (EquipmentData data in defaultEquipmentData)
+        {
+            if (data != null)
             {
-                equipmentType = type,
-                level = 1,
-                rarity = Rarity.Common,
-                stars = 0,
-                equipmentIcon = null // Ícone padrão opcional
-            };
-            playerEquipment.Add(defaultEquipment);
+                Equipment newEquipment = new Equipment
+                {
+                    equipmentType = data.equipmentType,
+                    level = 1,
+                    rarity = Rarity.Common,
+                    stars = 0,
+                    equipmentName = data.equipmentName,
+                    equipmentData = data,
+                    equipmentIcon = data.equipmentIcon // Usa o ícone definido no EquipmentData
+                };
+
+                playerEquipment.Add(newEquipment);
+            }
+            else
+            {
+                Debug.LogWarning("Um dos itens em DefaultEquipmentData é nulo!");
+            }
         }
 
         SaveEquipment();
+        Debug.Log("Equipamentos inicializados e salvos.");
     }
 
     public bool TryUpgradeEquipment(EquipmentType type)
     {
         Equipment equipment = GetEquipmentByType(type);
 
-        if (equipment == null)
+        if (equipment == null || equipment.level >= equipment.GetMaxLevel())
+        {
+            Debug.LogWarning($"Não é possível evoluir o equipamento {type}.");
             return false;
+        }
 
         // Calcula o custo baseado no nível atual do equipamento
         int blessCost = CalculateBlessCost(equipment.level);
@@ -109,12 +148,24 @@ public class PlayerEquipmentManager : MonoBehaviour
 
         // Gasta Bless e aumenta o nível do equipamento
         Inventory.instance.RemoveItem(blessItem, blessCost);
-        equipment.level++;
-        Debug.Log($"{type} foi evoluído para o nível {equipment.level}!");
+        bool success = Random.value <= equipment.GetUpgradeChance();
+        if (success)
+        {
+            equipment.level++;
+            Debug.Log($"{type} evoluído para o nível {equipment.level}!");
+
+        }
+        else
+        {
+            Inventory.instance.AddItem(powderBlessItem, 1);
+            Debug.LogWarning($"Evolução de {type} falhou. Bless foi convertido em PowderBless.");
+        }
 
         SaveEquipment();
         equipmentManager.UpdateInventory();
-        return true;
+        equipmentManager.RefreshUI();
+        ApplyModifiers();
+        return success;
     }
 
     public void AddStarsToEquipment(EquipmentType type, int starsToAdd)
@@ -137,11 +188,11 @@ public class PlayerEquipmentManager : MonoBehaviour
     /// <summary>
     /// Calcula o custo de Bless baseado no nível do equipamento.
     /// </summary>
-    private int CalculateBlessCost(int level)
+    public int CalculateBlessCost(int level)
     {
         // Exemplo: custo inicial de 10, aumenta em 5 a cada nível
         int baseCost = 1;
-        int costIncreasePerLevel = 5;
+        int costIncreasePerLevel = 2;
 
         return baseCost + (level - 1) * costIncreasePerLevel;
     }
@@ -174,6 +225,7 @@ public class PlayerEquipmentManager : MonoBehaviour
 
                 // Salva e atualiza a UI após cada alteração
                 SaveEquipment();
+                ApplyModifiers();
                 equipmentManager.RefreshUI();
             }
         }
@@ -193,6 +245,32 @@ public class PlayerEquipmentManager : MonoBehaviour
             }
         }
         return null;
+    }
+    public void ApplyModifiers()
+    {
+
+        if (playerStats == null)
+        {
+            Debug.LogError("PlayerStats não encontrado!");
+            return;
+        }
+
+        ResetModifiers();
+
+        foreach (var equipment in playerEquipment)
+        {
+            equipment.AddModifiers(playerStats);
+        }
+        GetComponent<UI_CharacterStats>()?.UpdateStatsUI();
+        playerStats.UpdateHealth();
+    }
+
+    private void ResetModifiers()
+    {
+        foreach (var equipment in playerEquipment)
+        {
+            equipment.RemoveModifiers(playerStats);
+        }
     }
     //COLORS
     private void InitializeRarityColors()
@@ -216,6 +294,12 @@ public class PlayerEquipmentManager : MonoBehaviour
         }
 
         return Color.white; // Retorna branco como padrão se a raridade não estiver configurada
+    }
+
+    private bool IsInMenuScene()
+    {
+        // Substitua "MenuScene" pelo nome exato da sua cena do menu
+        return SceneManager.GetActiveScene().name == "MenuScene";
     }
 
     // Salva as informações dos equipamentos usando Easy Save 3

@@ -41,7 +41,8 @@ MonoBehaviour:
   updateReferencesWhenSceneChanges: 1
   updateReferencesWhenSceneIsSaved: 1
   updateReferencesWhenSceneIsOpened: 1
-  referenceFolders: []
+  referenceFolders:
+  - Assets/ScriptableObject/Equipments_SO/
   logDebugInfo: 0
   logWarnings: 1
   logErrors: 1

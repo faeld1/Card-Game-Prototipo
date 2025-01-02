@@ -15,6 +15,7 @@ public class BattleManager : MonoBehaviour
     int gameOverOnce = 1;
 
     private int playerBaseEnergy;
+    private int startShield = 0;
 
     [SerializeField] private TextMeshProUGUI energyText;
 
@@ -44,6 +45,11 @@ public class BattleManager : MonoBehaviour
             howTurnText.text = "Turno do Player!";
             DeckManager.instance.ShowHand();
             playerStats.energy = playerBaseEnergy; //Reseta energia
+
+            startShield++;
+
+            if(startShield> 1)
+            playerStats.ResetShield(); //Reseta escudo
         }
         else
         {
@@ -78,7 +84,13 @@ public class BattleManager : MonoBehaviour
             CharacterStats enemy = enemies[i];
             if (enemy.currentHealth > 0 && enemy != null)
             {
-                playerStats.TakeDamage(10); // Dano fixo de 10, altere conforme necessário
+                int enemyDamage = enemy.damage.GetValue();
+
+                if (playerStats.TargetCanAvoidAttack(enemy))
+                {
+                    enemyDamage = 0;
+                }
+                playerStats.TakeDamage(enemyDamage); // Dano fixo de 10, altere conforme necessário
                 yield return new WaitForSeconds(0.5f); // Pequeno delay para ver cada ataque
             }
             else
