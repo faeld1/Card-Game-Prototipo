@@ -53,6 +53,19 @@ public class Player : MonoBehaviour
             {
                 Stats.IncreaseShield(cardData.defenseValue);
             }
+            else if(cardData.cardType == CardType.Support)
+            {
+                if (cardData.grantsEnergy)
+                {
+                    Stats.IncreasyEnergy(cardData.energyGranted);
+                }
+
+                if (cardData.healsPlayer)
+                {
+                    float healAmount = Stats.maxHealth.GetValue() * cardData.healPercentage / 100f;
+                    Stats.Heal(healAmount);
+                }
+            }
         }  
     }
 

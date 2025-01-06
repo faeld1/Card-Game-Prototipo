@@ -59,7 +59,6 @@ public class PlayerEquipmentManager : MonoBehaviour
 
         if (equipmentManager != null)
         {
-            Debug.Log("Iniciando PlayerEquipmentManager...");
             equipmentManager.RefreshUI(); // Atualiza a interface após garantir que os dados estão carregados
             if(IsInMenuScene())
             {
@@ -306,14 +305,12 @@ public class PlayerEquipmentManager : MonoBehaviour
     public void SaveEquipment()
     {
         ES3.Save(SaveKey, playerEquipment);
-        Debug.Log("Equipamentos salvos com sucesso!");
     }
 
     // Carrega as informações dos equipamentos usando Easy Save 3
     public void LoadEquipment()
     {
         playerEquipment = ES3.Load(SaveKey, new List<Equipment>());
-        Debug.Log("Equipamentos carregados com sucesso!");
     }
 }
 

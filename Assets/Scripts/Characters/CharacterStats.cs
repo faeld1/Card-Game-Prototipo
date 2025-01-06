@@ -44,7 +44,6 @@ public class CharacterStats : MonoBehaviour
     {
         if (level == 1)
         {
-            Debug.Log("No level 1, os stats base são usados diretamente sem modificações.");
             return; // Nenhuma modificação é aplicada no nível 1
         }
 
@@ -66,7 +65,6 @@ public class CharacterStats : MonoBehaviour
         // Adiciona o modificador ao stat
         _stat.AddModifiers(accumulatedGain);
 
-        Debug.Log($"Stat: {_stat}, Nível: {level}, Modificador Acumulado: {accumulatedGain}");
     }
 
     public virtual void DoDamage(CharacterStats targetStats)
@@ -108,6 +106,23 @@ public class CharacterStats : MonoBehaviour
     {
         shield = 0;
         OnHealthChanged?.Invoke();
+    }
+
+    public virtual void Heal(float _healAmount)
+    {
+        currentHealth += Mathf.RoundToInt(_healAmount);
+        if(currentHealth > maxHealth.GetValue())
+        {
+            currentHealth = maxHealth.GetValue();
+        }
+
+        OnHealthChanged?.Invoke();
+    }
+
+    public virtual void IncreasyEnergy(int _energyAmount)
+    {
+        energy += _energyAmount;
+        BattleManager.instance.UpdateEnergyText();
     }
 
     public virtual void UpdateHealth()

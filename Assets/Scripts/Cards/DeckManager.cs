@@ -177,6 +177,19 @@ public class DeckManager : MonoBehaviour
         }
     }
 
+    // Move todas as cartas da mão para a pilha de descarte
+    public void DiscardHand()
+    {
+        foreach (var card in hand)
+        {
+            discardPile.Add(card); // Adiciona a carta à pilha de descarte
+        }
+        hand.Clear(); // Limpa a mão após mover as cartas
+        drawedInitialHand = false;
+        DrawInitialHand(); // Desenha novas cartas para a mão
+    }
+
+
     public void UpdateUI()
     {
         // Verifica e atualiza mainDeckSlot e discardPileSlot com base em cardBack ou emptySlotSprite

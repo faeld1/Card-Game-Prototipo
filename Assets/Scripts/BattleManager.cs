@@ -56,10 +56,17 @@ public class BattleManager : MonoBehaviour
             howTurnText.text = "Turno do Enemy!";
             playerStats.energy = 0;
             DeckManager.instance.HideHand();
+            StartCoroutine(DiscardHandDelay());
             StartCoroutine(EnemyTurn());
         }
 
         UpdateEnergyText();
+    }
+
+    private IEnumerator DiscardHandDelay()
+    {
+        yield return new WaitForSeconds(1f);
+        DeckManager.instance.DiscardHand();
     }
 
     private void EndTurn()
@@ -123,7 +130,7 @@ public class BattleManager : MonoBehaviour
         }
     }
 
-    private void UpdateEnergyText()
+    public void UpdateEnergyText()
     {
         energyText.text = playerStats.energy.ToString();
     }

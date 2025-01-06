@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Inventory : MonoBehaviour
 {
@@ -39,16 +41,25 @@ public class Inventory : MonoBehaviour
 
         LoadInventoryData();
         inventoryItemSlot = inventorySlotParent.GetComponentsInChildren<UI_ItemSlot>();
-        UpdateSlotUI();
-        if(inventoryItems.Count == 0 )
+        
+
+        
+        //UpdateSlotUI();
+        if (inventoryItems.Count == 0)
         {
             AddStartingItems();
         }
+        EnsureStartingItemsInInventory();
 
-        
     }
     private void AddStartingItems()
     {
+        // Verifica se a cena atual é a do menu
+        if (SceneManager.GetActiveScene().name != "MainMenu")
+        {
+            Debug.Log("AddStartingItems só funciona na cena do menu.");
+            return;
+        }
         foreach (var itemData in startingItems)
         {
             if (itemData != null && !inventoryDictionary.ContainsKey(itemData))
@@ -56,6 +67,70 @@ public class Inventory : MonoBehaviour
                 AddItem(itemData, 0); // Adiciona os itens ao inventário com stack 0
             }
         }
+    }
+    private void EnsureStartingItemsInInventory()
+    {
+        // Verifica se a cena atual é a do menu
+        if (SceneManager.GetActiveScene().name != "MainMenu")
+        {
+            Debug.Log("EnsureStartingItemsInInventory só funciona na cena do menu.");
+            return;
+        }
+        // Usamos um HashSet para rastrear os itens já verificados e evitar duplicatas
+        HashSet<ItemData> alreadyProcessed = new HashSet<ItemData>();
+
+        foreach (var itemData in startingItems)
+        {
+            if (itemData == null) continue; // Ignora itens nulos
+
+            // Verifica se o item já foi processado para evitar múltiplas adições
+            if (alreadyProcessed.Contains(itemData))
+            {
+                Debug.LogWarning($"Item {itemData.itemName} já foi processado anteriormente. Ignorando.");
+                continue;
+            }
+
+            if (itemData.itemIcon == null)
+            {
+                Debug.LogWarning($"Item {itemData.itemName} não possui ícone. Verifique o ScriptableObject.");
+                continue;
+            }
+
+            // Marca o item como processado
+            alreadyProcessed.Add(itemData);
+
+            // Verifica se o item já está presente no inventário
+            if (!inventoryDictionary.ContainsKey(itemData))
+            {
+                Debug.Log($"Adicionando item inicial ausente: {itemData.itemName}");
+
+                // Adiciona o item com stack 0
+                AddItem(itemData, 0);
+            }
+            else
+            {
+                Debug.Log($"Item {itemData.itemName} já está presente no inventário.");
+            }
+        }
+        UpdateSlotUI();
+        // Salva o estado atualizado do inventário apenas uma vez
+        SaveInventoryData();
+    }
+    private void EnsureItemDataIntegrity(InventoryItem item)
+    {
+        if (item.data == null)
+        {
+            Debug.LogWarning("ItemData é nulo. Verificação ignorada.");
+            return;
+        }
+
+        // Verifica se o ícone do item está correto
+        if (item.data.itemIcon == null)
+        {
+            Debug.LogWarning($"Ícone do item {item.data.itemName} está nulo. Verifique o ScriptableObject.");
+        }
+
+        // Outras verificações podem ser adicionadas aqui, se necessário
     }
     public void AddItem(ItemData _item, int amount)
     {

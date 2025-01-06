@@ -7,6 +7,8 @@ public enum ItemType
     Bless,
     BlessDust,
     Keys,
+    Recipe,
+    Invite,
     Creation,
     Fragment
 }
