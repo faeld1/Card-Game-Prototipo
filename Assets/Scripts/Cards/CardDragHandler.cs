@@ -5,6 +5,7 @@ using UnityEngine.UI;
 public class CardDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     public CardData cardData;
+    public CardType cardType;
     private Vector3 originalPosition;
     private Transform parentToReturnTo = null;
     private RectTransform rectTransform;
@@ -14,6 +15,8 @@ public class CardDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     {
         rectTransform = GetComponent<RectTransform>();
         canvas = GetComponentInParent<Canvas>();
+
+        cardType = cardData.cardType;
     }
 
     public void OnBeginDrag(PointerEventData eventData)

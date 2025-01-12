@@ -3,7 +3,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System;
-using Unity.VisualScripting;
 using System.Collections;
 
 public class DeckManager : MonoBehaviour
