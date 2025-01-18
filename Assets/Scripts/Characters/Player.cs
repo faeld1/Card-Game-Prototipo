@@ -68,6 +68,11 @@ public class Player : MonoBehaviour
                 Stats.Heal(healAmount);
             }
         }
+        else if(cardData.cardType == CardType.Attack)
+        {
+            GetCurrentEnemyTarget();
+            PlayerUseAttack(CurrentEnemyTarget, cardData);
+        }
     }
 
     private IEnumerator ExecuteMultipleAttacks(Enemy_Stats initialTarget, int attackCount)

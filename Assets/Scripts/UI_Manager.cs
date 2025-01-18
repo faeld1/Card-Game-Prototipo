@@ -44,7 +44,8 @@ public class UI_Manager : MonoBehaviour
     private IEnumerator ExitAfterDelay()
     {
         yield return new WaitForSeconds(0.01f);
-        SceneManager.LoadScene("MainMenu");
+        LevelManager.Instance.ReturnToMenu();
+        //SceneManager.LoadScene("MainMenu");
     }
 
     private IEnumerator ShowEndGameDelay()

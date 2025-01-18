@@ -147,7 +147,7 @@ public class DeckManager : MonoBehaviour
 
     public void UseCard(CardData usedCard)
     {
-        if (hand.Contains(usedCard) && usedCard.cardType != CardType.Attack)
+        if (hand.Contains(usedCard)/* && usedCard.cardType != CardType.Attack*/)
         {
             OnCardUsed?.Invoke(usedCard);
 

@@ -33,8 +33,15 @@ public class LevelMenuManager : MonoBehaviour
             levelButtons[i].onClick.RemoveAllListeners();
             levelButtons[i].onClick.AddListener(() => OnLevelButtonClick(levelIndex));
 
-            // Resetando a cor padrão dos botões
-            levelButtons[i].GetComponent<Image>().color = defaultColor;
+            // Verifica se o botão é o selecionado e mantém a cor
+            if (i == selectedLevelIndex)
+            {
+                levelButtons[i].GetComponent<Image>().color = selectedColor;
+            }
+            else
+            {
+                levelButtons[i].GetComponent<Image>().color = defaultColor;
+            }
         }
     }
 
