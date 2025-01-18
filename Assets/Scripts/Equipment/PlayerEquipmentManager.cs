@@ -298,7 +298,7 @@ public class PlayerEquipmentManager : MonoBehaviour
     private bool IsInMenuScene()
     {
         // Substitua "MenuScene" pelo nome exato da sua cena do menu
-        return SceneManager.GetActiveScene().name == "MenuScene";
+        return SceneManager.GetActiveScene().name == "MainMenu";
     }
 
     // Salva as informações dos equipamentos usando Easy Save 3

@@ -16,7 +16,7 @@ public class CardDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         rectTransform = GetComponent<RectTransform>();
         canvas = GetComponentInParent<Canvas>();
 
-        cardType = cardData.cardType;
+        //cardType = cardData.cardType;
     }
 
     public void OnBeginDrag(PointerEventData eventData)

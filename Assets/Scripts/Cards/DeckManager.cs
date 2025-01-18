@@ -8,6 +8,7 @@ using System.Collections;
 public class DeckManager : MonoBehaviour
 {
     public static Action<CardData> OnCardUsed;
+    public static Action<Enemy_Stats,CardData> OnCardAttackUsed;
 
     public static DeckManager instance;
 
@@ -146,7 +147,7 @@ public class DeckManager : MonoBehaviour
 
     public void UseCard(CardData usedCard)
     {
-        if (hand.Contains(usedCard))
+        if (hand.Contains(usedCard) && usedCard.cardType != CardType.Attack)
         {
             OnCardUsed?.Invoke(usedCard);
 
@@ -167,7 +168,29 @@ public class DeckManager : MonoBehaviour
             UpdateUI();
         }
     }
+    public void UseCardAttack(Enemy_Stats enemyTarget,CardData usedCard)
+    {
+        if (hand.Contains(usedCard) && usedCard.cardType == CardType.Attack)
+        {
+            OnCardAttackUsed?.Invoke(enemyTarget, usedCard);
 
+            int index = hand.IndexOf(usedCard); // Armazena o índice da carta usada
+            hand.RemoveAt(index); // Remove a carta da mão
+            discardPile.Add(usedCard); // Adiciona a carta ao descarte
+
+            DrawCard();
+
+            // Move a nova carta para o lugar da carta usada
+            if (hand.Count < handSize && mainDeck.Count > 0) // Verifica se há cartas no baralho e se o índice é válido
+            {
+                CardData drawnCard = mainDeck[0];
+                hand.Insert(index, drawnCard); // Insere a nova carta no lugar da usada
+                mainDeck.RemoveAt(0); // Remove a nova carta do baralho
+            }
+
+            UpdateUI();
+        }
+    }
     public void SetHandVisibility(bool isVisible)
     {
         foreach (var slot in handSlots)
@@ -231,6 +254,7 @@ public class DeckManager : MonoBehaviour
                     dragHandler = handSlots[i].gameObject.AddComponent<CardDragHandler>();
 
                 dragHandler.cardData = card; // Atribui o CardData automaticamente
+                dragHandler.cardType = card.cardType; // Atualiza o tipo da carta
             }
             else
             {

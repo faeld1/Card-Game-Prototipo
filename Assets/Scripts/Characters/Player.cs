@@ -38,41 +38,59 @@ public class Player : MonoBehaviour
    
     }
 
-    private void PlayerAttackOrShield(CardData cardData)
+    private void PlayerUseAttack(Enemy_Stats targetEnemy, CardData cardData)
     {
         if (CurrentEnemyTarget != null)
         {
             if (cardData.cardType == CardType.Attack)
             {
                 //Stats.DoDamage(CurrentEnemyTarget, cardData.attackValue);
-                StartCoroutine(ExecuteMultipleAttacks(cardData.attackValue));
-            }
-            else if (cardData.cardType == CardType.Defense)
-            {
-                Stats.IncreaseShield(cardData.defenseValue);
-            }
-            else if(cardData.cardType == CardType.Support)
-            {
-                if (cardData.grantsEnergy)
-                {
-                    Stats.IncreasyEnergy(cardData.energyGranted);
-                }
-
-                if (cardData.healsPlayer)
-                {
-                    float healAmount = Stats.maxHealth.GetValue() * cardData.healPercentage / 100f;
-                    Stats.Heal(healAmount);
-                }
+                StartCoroutine(ExecuteMultipleAttacks(targetEnemy,cardData.attackValue));
             }
         }  
     }
-
-    private IEnumerator ExecuteMultipleAttacks(int attackCount)
+    private void PlayerUseDefenseOrSupport(CardData cardData)
     {
+        if (cardData.cardType == CardType.Defense)
+        {
+            Stats.IncreaseShield(cardData.defenseValue);
+        }
+        else if (cardData.cardType == CardType.Support)
+        {
+            if (cardData.grantsEnergy)
+            {
+                Stats.IncreasyEnergy(cardData.energyGranted);
+            }
+
+            if (cardData.healsPlayer)
+            {
+                float healAmount = Stats.maxHealth.GetValue() * cardData.healPercentage / 100f;
+                Stats.Heal(healAmount);
+            }
+        }
+    }
+
+    private IEnumerator ExecuteMultipleAttacks(Enemy_Stats initialTarget, int attackCount)
+    {
+        Enemy_Stats currentTarget = initialTarget;
         for (int i = 0; i < attackCount; i++)
         {
-            Stats.DoDamage(CurrentEnemyTarget);
-            animator.SetTrigger("Attack");
+            if (currentTarget != null && currentTarget.currentHealth > 0)
+            {
+                Stats.DoDamage(currentTarget);
+                animator.SetTrigger("Attack");
+            }
+            else
+            {
+                GetCurrentEnemyTarget(); // Atualiza para o inimigo mais próximo
+                currentTarget = CurrentEnemyTarget;
+
+                if (currentTarget == null) // Sem inimigos restantes
+                {
+                    Debug.Log("Todos os inimigos foram derrotados!");
+                    break;
+                }
+            }
 
             yield return new WaitForSeconds(0.3f);
         }
@@ -134,12 +152,14 @@ public class Player : MonoBehaviour
 
     private void OnEnable()
     {
-        DeckManager.OnCardUsed += PlayerAttackOrShield;
+        DeckManager.OnCardUsed += PlayerUseDefenseOrSupport;
+        DeckManager.OnCardAttackUsed += PlayerUseAttack;
     }
 
     private void OnDisable()
     {
-        DeckManager.OnCardUsed -= PlayerAttackOrShield;
+        DeckManager.OnCardUsed -= PlayerUseDefenseOrSupport;
+        DeckManager.OnCardAttackUsed -= PlayerUseAttack;
     }
 
     private void OnDrawGizmos()

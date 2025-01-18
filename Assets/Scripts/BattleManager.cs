@@ -147,13 +147,28 @@ public class BattleManager : MonoBehaviour
         }
     }
 
+    private void UseCardAttack(Enemy_Stats enemyTarget,CardData cardData)
+    {
+        if (playerTurn && playerStats.energy >= cardData.energyCost)
+        {
+            playerStats.energy -= cardData.energyCost;
+            UpdateEnergyText();
+
+            if (playerStats.energy <= 0)
+                EndTurn();
+        }
+    }
+
+
     private void OnEnable()
     {
         DeckManager.OnCardUsed += UseCard;
+        DeckManager.OnCardAttackUsed += UseCardAttack;
     }
 
     private void OnDisable()
     {
         DeckManager.OnCardUsed -= UseCard;
+        DeckManager.OnCardAttackUsed -= UseCardAttack;
     }
 }

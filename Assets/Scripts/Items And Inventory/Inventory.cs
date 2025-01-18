@@ -109,7 +109,7 @@ public class Inventory : MonoBehaviour
             }
             else
             {
-                Debug.Log($"Item {itemData.itemName} já está presente no inventário.");
+                //Debug.Log($"Item {itemData.itemName} já está presente no inventário.");
             }
         }
         UpdateSlotUI();
@@ -272,7 +272,6 @@ public class Inventory : MonoBehaviour
 
     private void LoadInventoryData()
     {
-        Debug.Log("Carregando inventário...");
         if (ES3.KeyExists(InventorySaveKey + "_List"))
         {
             inventoryItems = ES3.Load<List<InventoryItem>>(InventorySaveKey + "_List");

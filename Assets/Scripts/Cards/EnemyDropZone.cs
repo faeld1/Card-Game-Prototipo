@@ -30,7 +30,9 @@ public class EnemyDropZone : MonoBehaviour, IDropHandler, IPointerEnterHandler, 
         CardDragHandler card = eventData.pointerDrag?.GetComponent<CardDragHandler>();
         if (card != null && card.cardType == CardType.Attack)
         {
-            DeckManager.instance.UseCard(card.cardData);
+            Enemy_Stats enemyTarget = GetComponentInParent<Enemy_Stats>();
+
+            DeckManager.instance.UseCardAttack(enemyTarget,card.cardData);
             enemyFX.ShowSelectedEffect(false);
         }
     }
