@@ -59,6 +59,7 @@ public class LevelManager : MonoBehaviour
         }
 
         UI_Manager.instance.ShowEndGame();
+        DeckManager.instance.HideHand();
       
     }
 

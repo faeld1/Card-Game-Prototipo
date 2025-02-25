@@ -5,13 +5,21 @@ public class PlayerFX : MonoBehaviour
 {
     [SerializeField] private Transform textDamageSpawnPosition;
     [SerializeField] private GameObject textDamagePrefab;
+    [SerializeField] private GameObject selectedEffect; // Efeito de seleção
 
     private PlayerStats playerStats;
 
     private void Start()
     {
         playerStats = GetComponent<PlayerStats>();
+        ShowSelectedEffect(false); // Garantir que o efeito esteja desativado no início
     }
+    public void ShowSelectedEffect(bool show)
+    {
+        if (selectedEffect != null)
+            selectedEffect.SetActive(show);
+    }
+
 
     private void PlayerHit(PlayerStats player, int damage)
     {

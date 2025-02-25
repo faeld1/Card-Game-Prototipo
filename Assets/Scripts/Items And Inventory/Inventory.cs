@@ -73,7 +73,6 @@ public class Inventory : MonoBehaviour
         // Verifica se a cena atual é a do menu
         if (SceneManager.GetActiveScene().name != "MainMenu")
         {
-            Debug.Log("EnsureStartingItemsInInventory só funciona na cena do menu.");
             return;
         }
         // Usamos um HashSet para rastrear os itens já verificados e evitar duplicatas
