@@ -93,6 +93,11 @@ public class Player : MonoBehaviour
                     Debug.Log("CurrentEnemyTarget é null no StartNextAttack");
                 }
 
+                if(CurrentEnemyTarget.currentHealth <= 0)
+                {
+                    Debug.Log("CurrentEnemyTarget.currentHealth <= 0 no StartNextAttack");
+                }
+
                 if (CurrentEnemyTarget != null && CurrentEnemyTarget.currentHealth > 0)
                 {
                     attackQueue.Enqueue(CurrentEnemyTarget);
