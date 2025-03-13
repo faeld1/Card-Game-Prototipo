@@ -52,7 +52,7 @@ public class CharacterStats : MonoBehaviour
         Modify(maxHealth, 10, 10000); // De +10 no level 2 a +10000 no level 100
         Modify(armor, 5, 50000); // De +5 no level 2 a +50000 no level 100
 
-        Debug.Log($"Stats ajustados para o nível {level}. Damage: {damage.GetValue()}, MaxHealth: {maxHealth.GetValue()}, Armor: {armor.GetValue()}");
+       // Debug.Log($"Stats ajustados para o nível {level}. Damage: {damage.GetValue()}, MaxHealth: {maxHealth.GetValue()}, Armor: {armor.GetValue()}");
     }
 
     private void Modify(Stats _stat, int minGain, int maxGain)
@@ -172,7 +172,7 @@ public class CharacterStats : MonoBehaviour
 
         if (UnityEngine.Random.Range(0, 100) < totalEvasion)
         {
-            Debug.Log("Attack avoided");
+            //Debug.Log("Attack avoided");
             return true;
         }
         return false;

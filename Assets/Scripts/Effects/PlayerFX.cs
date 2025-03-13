@@ -1,11 +1,15 @@
 using UnityEngine;
 using TMPro;
+using System.Collections;
 
 public class PlayerFX : MonoBehaviour
 {
     [SerializeField] private Transform textDamageSpawnPosition;
     [SerializeField] private GameObject textDamagePrefab;
     [SerializeField] private GameObject selectedEffect; // Efeito de seleção
+
+    [SerializeField] private GameObject healEffect;
+    [SerializeField] private GameObject levelUpEffect;
 
     private PlayerStats playerStats;
 
@@ -35,8 +39,14 @@ public class PlayerFX : MonoBehaviour
 
             TextMeshProUGUI damageText = newInstance.GetComponent<DamageText>().damageText;
             damageText.text = damage.ToString();
+            damageText.color = Color.white;
 
-            if (damage == 0)
+            if (damage <= player.shield) //Deixa a cor do texto azul se o dano for absorvido pelo escudo
+            {
+                damageText.color = Color.blue;
+            }
+
+            if (damage == 0) //Se o dano for 0, exibe "Miss" no texto
             {
                 damageText.text = "Miss";
                 damageText.color = Color.white;
@@ -45,6 +55,31 @@ public class PlayerFX : MonoBehaviour
             newInstance.transform.position = textDamageSpawnPosition.position + randomPosition;
             newInstance.SetActive(true);
         }
+    }
+
+    public void PlayHealEffect()
+    {
+        if (healEffect != null)
+        {
+            healEffect.SetActive(true);
+            StartCoroutine(DisableEffectAfterTime(healEffect, 2f)); // Desativa após 2s
+        }
+    }
+
+    public void PlayLevelUpEffect()
+    {
+        if (levelUpEffect != null)
+        {
+            levelUpEffect.SetActive(true);
+            StartCoroutine(DisableEffectAfterTime(levelUpEffect, 5f)); // Desativa após 5s
+        }
+    }
+
+    // Método auxiliar para desativar efeitos após um tempo
+    private IEnumerator DisableEffectAfterTime(GameObject effect, float time)
+    {
+        yield return new WaitForSeconds(time);
+        effect.SetActive(false);
     }
 
     private void OnEnable()

@@ -5,12 +5,14 @@ public class Enemy_Stats : CharacterStats
 {
     public static Action<int> OnEnemyDie;
     private DropItem myDropSystem;
+    public Enemy enemy;
 
     [SerializeField] private int xpReward = 5;
 
     protected override void Start()
     {
         base.Start();
+        enemy = GetComponent<Enemy>();
         myDropSystem = GetComponent<DropItem>();
     }
 

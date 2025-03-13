@@ -20,8 +20,7 @@ public class CardDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     }
 
     public void OnBeginDrag(PointerEventData eventData)
-    {
-        //originalPosition = transform.position;
+    { 
         originalPosition = rectTransform.position;
         parentToReturnTo = transform.parent;
         transform.SetParent(transform.root);  // Torna a carta um elemento de nível superior para que não fique "preso" na UI enquanto arrasta
@@ -30,7 +29,6 @@ public class CardDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
 
     public void OnDrag(PointerEventData eventData)
     {
-        //transform.position = eventData.position; // Atualiza a posição da carta para a posição do ponteiro
         rectTransform.anchoredPosition += eventData.delta / canvas.scaleFactor;
     }
 

@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,10 +5,11 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
 
-    private Animator animator;
+    public Animator animator;
 
     public CharacterStats Stats { get; set; }
     public PlayerStats PlayerStats_ { get; set; }
+    public PlayerFX PlayerFX { get; set; }
 
     [SerializeField] private float attackRange = 3f;
 
@@ -18,13 +18,20 @@ public class Player : MonoBehaviour
     public float AttackRange => attackRange;
     private bool gameStarted;
 
-   [SerializeField] private List<Enemy_Stats> _enemies;
+    [Header("Player Attacking")]
+    private bool isAttacking = false;
+    public bool isAttackingAnimation = false;
+    private Queue<Enemy_Stats> attackQueue = new Queue<Enemy_Stats>();
+    private int remainingAttacks = 0;
+
+    [SerializeField] private List<Enemy_Stats> _enemies;
 
     private void Start()
     {
         Stats = GetComponent<CharacterStats>();
         PlayerStats_ = GetComponent<PlayerStats>();
-        animator = GetComponent<Animator>();
+        PlayerFX = GetComponent<PlayerFX>();
+        animator = GetComponentInChildren<Animator>();
         _enemies = new List<Enemy_Stats>();
 
         StartCoroutine(GameStartedDelay());
@@ -33,72 +40,201 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
-
         GetCurrentEnemyTarget();
-   
+    }
+
+    public void SetTargetEnemy(Enemy_Stats targetEnemy)
+    {
+        if (targetEnemy != null && targetEnemy.currentHealth > 0)
+        {
+            CurrentEnemyTarget = targetEnemy;
+        }
     }
 
     private void PlayerUseAttack(Enemy_Stats targetEnemy, CardData cardData)
     {
+        if (isAttacking) return; // Bloqueia novas cartas enquanto estiver atacando
         if (CurrentEnemyTarget != null)
         {
-            if (cardData.cardType == CardType.Attack)
-            {
-                //Stats.DoDamage(CurrentEnemyTarget, cardData.attackValue);
-                StartCoroutine(ExecuteMultipleAttacks(targetEnemy,cardData.attackValue));
-            }
-        }  
+            SetTargetEnemy(targetEnemy);
+
+            attackQueue.Enqueue(targetEnemy);
+            remainingAttacks += cardData.attackValue;
+
+            isAttacking = true; // Bloqueia cartas até terminar os ataques
+            isAttackingAnimation = true;
+            UI_Manager.instance.ShowBlockHandCards();
+            StartNextAttack();
+        }
     }
+    private void StartNextAttack()
+    {
+        Debug.Log("StartNextAttack chamado. RemainingAttacks: " + remainingAttacks + " | Queue Size: " + attackQueue.Count);
+        if (remainingAttacks > 0 && attackQueue.Count > 0)
+        {
+            Enemy_Stats target = attackQueue.Peek();
+
+            if (target == null || target.currentHealth <= 0)
+            {
+                if (target == null)
+                {
+                    Debug.Log("Target é null no StartNextAttack");
+                }
+                else
+                {
+                    Debug.Log("Target nao é nulo no StartNextAttack");
+                }
+
+                attackQueue.Dequeue();
+                GetCurrentEnemyTarget();
+
+                if(CurrentEnemyTarget == null)
+                {
+                    Debug.Log("CurrentEnemyTarget é null no StartNextAttack");
+                }
+
+                if (CurrentEnemyTarget != null && CurrentEnemyTarget.currentHealth > 0)
+                {
+                    attackQueue.Enqueue(CurrentEnemyTarget);
+                    target = CurrentEnemyTarget;
+                    Debug.Log("Terceiro if do StartnextAttack chamado");
+                }
+                Debug.Log("Segundo if do StartnextAttack chamado");
+            }
+
+            if (target != null && target.currentHealth > 0)
+            {
+                animator.SetBool("IsAttacking", true);
+
+                // Escolhe um número aleatório entre 1 e 3
+                int randomAttack = UnityEngine.Random.Range(1, 4);
+
+                // Ativa um dos três triggers
+                animator.SetTrigger("Attack_" + randomAttack);
+            }
+            else
+            {
+                isAttacking = false;
+                animator.SetBool("IsAttacking", false);
+                Debug.Log("HideBlockHandCards sendo chamado no StartNextAttack");
+                UI_Manager.instance.HideBlockHandCards();
+            }
+        }
+        else
+        {
+            isAttacking = false;
+            animator.SetBool("IsAttacking", false);
+            Debug.Log("RemainingAttacks <= 0 no StartNextAttack");
+        }
+
+    }
+
+    // Esta função será chamada no fim da animação via Animation Event
+    public void OnAttackAnimationEnd()
+    {
+
+        isAttackingAnimation = true;
+        if (remainingAttacks <= 0)
+        {
+            //Debug.Log("HideBlockHandCards sendo chamado no remaingAttack = 0 do OnAttackAnimationEnd");
+            UI_Manager.instance.HideBlockHandCards();
+            isAttacking = false;
+            isAttackingAnimation = false;
+            animator.SetBool("IsAttacking", false);
+            return;
+        }
+
+        // Se não há alvo ou ele morreu, buscar o próximo
+        if (CurrentEnemyTarget == null || CurrentEnemyTarget.currentHealth <= 0)
+        {
+            _enemies.Remove(CurrentEnemyTarget); // Remove da lista de inimigos
+            GetCurrentEnemyTarget(); // Pega o próximo da fila
+        }
+
+        // Se ainda temos um inimigo válido, atacar
+        if (CurrentEnemyTarget != null && CurrentEnemyTarget.currentHealth > 0)
+        {
+            Stats.DoDamage(CurrentEnemyTarget);
+            remainingAttacks--;
+
+            // Se ainda há ataques restantes, continuar
+            if (remainingAttacks > 0)
+            {
+                StartNextAttack();
+            }
+            else
+            {
+                //Debug.Log("PlayerCurrentEnergy: " + BattleManager.instance.PlayerCurrentEnergy);
+                if (BattleManager.instance.PlayerCurrentEnergy > 0)
+                {
+                    //Debug.Log("HideBlockHandCards sendo chamado no primeiro else do OnAttackAnimationEnd");
+                    UI_Manager.instance.HideBlockHandCards();
+                }
+                else
+                    UI_Manager.instance.ShowBlockHandCards();
+
+                isAttacking = false;
+                animator.SetBool("IsAttacking", false);
+            }
+        }
+        else
+        {
+            //Debug.Log("HideBlockHandCards sendo chamado no segundo else do OnAttackAnimationEnd");
+            UI_Manager.instance.HideBlockHandCards();
+            isAttacking = false;
+            animator.SetBool("IsAttacking", false);
+        }
+
+        if (remainingAttacks <= 0)
+        {
+            isAttackingAnimation = false;
+        }
+    }
+    public void OnHitAnimationEnd()
+    {
+        BattleManager.instance.OnPlayerHitAnimationEnd();
+    }
+    public void OnSupportAnimationEnd()
+    {
+        //Debug.Log("HideBlockHandCards sendo chamado no OnSupportAnimationEnd");
+        UI_Manager.instance.HideBlockHandCards();
+    }
+
     private void PlayerUseDefenseOrSupport(CardData cardData)
     {
         if (cardData.cardType == CardType.Defense)
         {
             Stats.IncreaseShield(cardData.defenseValue);
+            UI_Manager.instance.ShowBlockHandCards();
+            animator.SetTrigger("Shield");
         }
         else if (cardData.cardType == CardType.Support)
         {
             if (cardData.grantsEnergy)
             {
                 Stats.IncreasyEnergy(cardData.energyGranted);
+                //Debug.Log("HideBlockHandCards sendo chamado no PlayerUseDefenseOrSupport");
+                UI_Manager.instance.HideBlockHandCards();
             }
 
             if (cardData.healsPlayer)
             {
-                float healAmount = Stats.maxHealth.GetValue() * cardData.healPercentage / 100f;
-                Stats.Heal(healAmount);
+                HealPlayer(cardData);
             }
         }
-        else if(cardData.cardType == CardType.Attack)
+        else if (cardData.cardType == CardType.Attack)
         {
             GetCurrentEnemyTarget();
             PlayerUseAttack(CurrentEnemyTarget, cardData);
         }
     }
 
-    private IEnumerator ExecuteMultipleAttacks(Enemy_Stats initialTarget, int attackCount)
+    private void HealPlayer(CardData cardData)
     {
-        Enemy_Stats currentTarget = initialTarget;
-        for (int i = 0; i < attackCount; i++)
-        {
-            if (currentTarget != null && currentTarget.currentHealth > 0)
-            {
-                Stats.DoDamage(currentTarget);
-                animator.SetTrigger("Attack");
-            }
-            else
-            {
-                GetCurrentEnemyTarget(); // Atualiza para o inimigo mais próximo
-                currentTarget = CurrentEnemyTarget;
-
-                if (currentTarget == null) // Sem inimigos restantes
-                {
-                    Debug.Log("Todos os inimigos foram derrotados!");
-                    break;
-                }
-            }
-
-            yield return new WaitForSeconds(0.3f);
-        }
+        animator.SetTrigger("Heal");
+        float healAmount = Stats.maxHealth.GetValue() * cardData.healPercentage / 100f;
+        Stats.Heal(healAmount);
+        PlayerFX.PlayHealEffect();
     }
 
     private IEnumerator GameStartedDelay()
@@ -107,22 +243,33 @@ public class Player : MonoBehaviour
         gameStarted = true;
     }
 
-
     private void GetCurrentEnemyTarget()
     {
-        if(_enemies.Count <= 0 && gameStarted)
+        if (_enemies.Count <= 0 && gameStarted)
         {
             CurrentEnemyTarget = null;
             BattleManager.instance.VerifyPlayerIsAlive();
             return;
         }
 
+        // Se já temos um alvo válido, não alterar
+        if (CurrentEnemyTarget != null && CurrentEnemyTarget.currentHealth > 0)
+        {
+            return;
+        }
+
         Enemy_Stats closestEnemy = null;
         float closestDistance = Mathf.Infinity;
 
+        // Remove inimigos destruídos antes de calcular o mais próximo
+        _enemies.RemoveAll(enemy => enemy == null);
+
         foreach (var enemy in _enemies)
         {
-            float distanceToEnemy = Vector2.Distance(transform.position, enemy.transform.position);
+            // Confere se o inimigo ainda existe antes de acessar suas propriedades
+            if (enemy == null) continue;
+
+            float distanceToEnemy = Vector3.Distance(transform.position, enemy.transform.position);
 
             if (distanceToEnemy < closestDistance)
             {
@@ -135,23 +282,29 @@ public class Player : MonoBehaviour
 
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    private void OnTriggerEnter(Collider collision)
+    {
+
+        if (collision.CompareTag("Enemy"))
+        {
+            Enemy_Stats newEnemy = collision.GetComponent<Enemy_Stats>();
+            if (newEnemy != null && !_enemies.Contains(newEnemy))
+            {
+                _enemies.Add(newEnemy);
+            }
+        }
+    }
+
+    private void OnTriggerExit(Collider collision)
     {
         if (collision.CompareTag("Enemy"))
         {
             Enemy_Stats newEnemy = collision.GetComponent<Enemy_Stats>();
-            _enemies.Add(newEnemy);
-        }
-    }
 
-    private void OnTriggerExit2D(Collider2D collision)
-    {
-       if( collision.CompareTag("Enemy"))
-        {
-            Enemy_Stats newEnemy = collision.GetComponent<Enemy_Stats>();
-
-            if(_enemies.Contains(newEnemy))
-            _enemies.Remove(newEnemy);
+            if (newEnemy != null && _enemies.Contains(newEnemy))
+            {
+                _enemies.Remove(newEnemy);
+            }
         }
     }
 
@@ -169,10 +322,16 @@ public class Player : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        GetComponent<CircleCollider2D>().radius = attackRange;
 
-        Gizmos.color = Color.green;
-        Gizmos.DrawWireSphere(transform.position, AttackRange);
+        SphereCollider sphereCollider = GetComponent<SphereCollider>();
+
+        sphereCollider.radius = attackRange;
+
+        if (sphereCollider != null)
+        {
+            Gizmos.color = Color.green;
+            Gizmos.DrawWireSphere(transform.position + sphereCollider.center, attackRange);
+        }
     }
 
 }

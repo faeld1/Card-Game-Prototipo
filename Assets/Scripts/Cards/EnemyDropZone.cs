@@ -28,14 +28,20 @@ public class EnemyDropZone : MonoBehaviour, IDropHandler, IPointerEnterHandler, 
     public void OnDrop(PointerEventData eventData)
     {
         CardDragHandler card = eventData.pointerDrag?.GetComponent<CardDragHandler>();
+
         if (card != null && card.cardType == CardType.Attack)
         {
             Enemy_Stats enemyTarget = GetComponentInParent<Enemy_Stats>();
 
-            DeckManager.instance.UseCardAttack(enemyTarget,card.cardData);
+            //Debug.Log("Carta de ataque aceita!");
+
+            DeckManager.instance.UseCardAttack(enemyTarget, card.cardData);
+
+            UI_Manager.instance.ShowBlockHandCards();
+
             enemyFX.ShowSelectedEffect(false);
         }
-    }
 
+    }
 
 }

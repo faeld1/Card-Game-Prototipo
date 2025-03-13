@@ -16,7 +16,7 @@ public class InventoryItem
     public void AddStack(int amount)
     {
         stackSize += amount;
-        Debug.Log($"Stack atualizado: {data.name}, Novo tamanho do stack: {stackSize}");
+        //Debug.Log($"Stack atualizado: {data.name}, Novo tamanho do stack: {stackSize}");
     }
 
     public void RemoveStack(int amount)

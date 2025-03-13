@@ -16,16 +16,17 @@ MonoBehaviour:
   levelNumber: 2
   isUnlocked: 1
   subLevel1Enemies:
-  - {fileID: 3559638728608176151, guid: 20e81f38fc44d9e4abad89a37b545165, type: 3}
+  - {fileID: 6222603041924583266, guid: 6825b4a0dbdcbec42b5428dcdd12f16c, type: 3}
+  - {fileID: 6222603041924583266, guid: 6825b4a0dbdcbec42b5428dcdd12f16c, type: 3}
   subLevel2Enemies:
-  - {fileID: 3559638728608176151, guid: 20e81f38fc44d9e4abad89a37b545165, type: 3}
+  - {fileID: 6222603041924583266, guid: 1c0458805fc30924f9297e339038c521, type: 3}
   subLevel3Enemies:
-  - {fileID: 3559638728608176151, guid: 9bbf04d67a8726b40b3b223b57b5a062, type: 3}
-  - {fileID: 3559638728608176151, guid: 9bbf04d67a8726b40b3b223b57b5a062, type: 3}
+  - {fileID: 6222603041924583266, guid: 1c0458805fc30924f9297e339038c521, type: 3}
+  - {fileID: 6222603041924583266, guid: 6825b4a0dbdcbec42b5428dcdd12f16c, type: 3}
   subLevel4Enemies:
-  - {fileID: 3559638728608176151, guid: 20e81f38fc44d9e4abad89a37b545165, type: 3}
-  - {fileID: 3559638728608176151, guid: 20e81f38fc44d9e4abad89a37b545165, type: 3}
+  - {fileID: 6222603041924583266, guid: 6825b4a0dbdcbec42b5428dcdd12f16c, type: 3}
+  - {fileID: 6222603041924583266, guid: 6825b4a0dbdcbec42b5428dcdd12f16c, type: 3}
   subLevel5Enemies:
-  - {fileID: 3559638728608176151, guid: 9bbf04d67a8726b40b3b223b57b5a062, type: 3}
-  - {fileID: 3559638728608176151, guid: 20e81f38fc44d9e4abad89a37b545165, type: 3}
-  - {fileID: 3559638728608176151, guid: 20e81f38fc44d9e4abad89a37b545165, type: 3}
+  - {fileID: 6222603041924583266, guid: 1c0458805fc30924f9297e339038c521, type: 3}
+  - {fileID: 6222603041924583266, guid: 6825b4a0dbdcbec42b5428dcdd12f16c, type: 3}
+  - {fileID: 6222603041924583266, guid: 1c0458805fc30924f9297e339038c521, type: 3}

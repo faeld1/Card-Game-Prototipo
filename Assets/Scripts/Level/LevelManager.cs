@@ -132,7 +132,7 @@ public class LevelManager : MonoBehaviour
     {
         // Remove todas as cartas marcadas como temporárias
         mainDeck.RemoveAll(card => card.isTemporary); // Supondo que `isTemporary` é um campo booleano em CardData
-        Debug.Log("Cartas temporárias removidas do mainDeck.");
+        //Debug.Log("Cartas temporárias removidas do mainDeck.");
     }
     public void TrackEvolution(CardData originalCard, CardData evolvedCard)
     {

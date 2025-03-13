@@ -36,7 +36,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 1.5, y: 0.4}
+  m_SizeDelta: {x: 1.5, y: 0.2}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &6864986367103629598
 MonoBehaviour:
@@ -288,6 +288,7 @@ GameObject:
   - component: {fileID: 6264787592559082148}
   - component: {fileID: 2926700958846394783}
   - component: {fileID: 7770568206963322832}
+  - component: {fileID: -3199269521775752518}
   m_Layer: 0
   m_Name: Canvas_Health
   m_TagString: Untagged
@@ -313,7 +314,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 1}
-  m_SizeDelta: {x: 1.5, y: 0.4}
+  m_SizeDelta: {x: 1.5, y: 0.2}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!223 &7113903149368277232
 Canvas:
@@ -360,7 +361,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 1
+  m_PresetInfoIsWorld: 0
 --- !u!114 &2926700958846394783
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -390,3 +391,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f8803c21db5c8d42928f02651b91868, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &-3199269521775752518
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4031256297417969296}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0449274e39009cb4da25197c5e54da01, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cam: {fileID: 0}

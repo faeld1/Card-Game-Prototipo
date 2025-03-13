@@ -88,5 +88,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ef05f1ecced5f14e9b4609fdadd9c1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  highlightEffect: {fileID: 0}
   itemData: {fileID: 0}

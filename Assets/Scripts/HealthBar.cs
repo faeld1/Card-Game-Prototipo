@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -5,6 +6,8 @@ public class HealthBar : MonoBehaviour
 {
     private CharacterStats myStats;
     private Slider slider;
+    private Enemy enemy;
+    private Player player;
 
     private bool allowVerify = false;
 
@@ -12,6 +15,8 @@ public class HealthBar : MonoBehaviour
     {
         slider = GetComponentInChildren<Slider>();
         myStats = GetComponentInParent<CharacterStats>();
+        enemy = GetComponentInParent<Enemy>();
+        player = GetComponentInParent<Player>();
 
         UpdateHealthUI();
     }
@@ -22,16 +27,37 @@ public class HealthBar : MonoBehaviour
         slider.maxValue = myStats.maxHealth.GetValue();
         slider.value = myStats.currentHealth;
 
-        if(allowVerify)
-        BattleManager.instance.VerifyPlayerIsAlive();
+        if (allowVerify)
+            BattleManager.instance.VerifyPlayerIsAlive();
 
         if (myStats.currentHealth <= 0)
-        {  
+        {
             Destroy(myStats.gameObject);
+            if (enemy != null)
+            {
+                enemy.enemyAnim.SetTrigger("Death");
+            }
+            if(player != null)
+            {
+                player.animator.SetTrigger("Death");
+            }
+
+            this.slider.gameObject.SetActive(false);
+            
+            //StartCoroutine(DeathWithDelay());
         }
 
         allowVerify = true;
 
+    }
+    private IEnumerator DeathWithDelay()
+    {
+        Destroy(myStats);
+        yield return new WaitForSeconds(1.5f);
+        if (enemy != null)
+        {
+            Destroy(enemy.gameObject);
+        }
     }
 
     private void OnEnable()

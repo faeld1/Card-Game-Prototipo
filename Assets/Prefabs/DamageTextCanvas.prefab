@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 3378849992208247738}
   - component: {fileID: 5275534458306296398}
   - component: {fileID: 5906660701279160929}
+  - component: {fileID: 4395241966073930879}
   m_Layer: 5
   m_Name: DamageTextCanvas
   m_TagString: Untagged
@@ -85,7 +86,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 1
+  m_PresetInfoIsWorld: 0
 --- !u!114 &5275534458306296398
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -115,6 +116,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9db54aa884c65014d9c5355dc6d2bd1e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &4395241966073930879
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2152921701177705028}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0449274e39009cb4da25197c5e54da01, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cam: {fileID: 0}
 --- !u!1 &4210896596275818158
 GameObject:
   m_ObjectHideFlags: 0

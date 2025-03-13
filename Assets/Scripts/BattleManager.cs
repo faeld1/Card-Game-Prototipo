@@ -15,7 +15,10 @@ public class BattleManager : MonoBehaviour
     int gameOverOnce = 1;
 
     private int playerBaseEnergy;
+    public int PlayerCurrentEnergy => playerStats.energy;
     private int startShield = 0;
+
+    private bool isPlayerTakingHit = false;
 
     [SerializeField] private TextMeshProUGUI energyText;
 
@@ -40,22 +43,24 @@ public class BattleManager : MonoBehaviour
 
     private void StartTurn()
     {
-        if(playerTurn)
+        if (playerTurn)
         {
             howTurnText.text = "Turno do Player!";
             DeckManager.instance.ShowHand();
+           // UI_Manager.instance.HideBlockHandCards();
             playerStats.energy = playerBaseEnergy; //Reseta energia
 
             startShield++;
 
-            if(startShield> 1)
-            playerStats.ResetShield(); //Reseta escudo
+            if (startShield > 1)
+                playerStats.ResetShield(); //Reseta escudo
         }
         else
         {
             howTurnText.text = "Turno do Enemy!";
             playerStats.energy = 0;
-            DeckManager.instance.HideHand();
+            //DeckManager.instance.HideHand();
+            UI_Manager.instance.ShowBlockHandCards();
             StartCoroutine(DiscardHandDelay());
             StartCoroutine(EnemyTurn());
         }
@@ -71,6 +76,22 @@ public class BattleManager : MonoBehaviour
 
     private void EndTurn()
     {
+        if(playerTurn)
+            UI_Manager.instance.ShowBlockHandCards();
+            
+        StartCoroutine(DelayEndTurn());     
+    }
+
+    private IEnumerator DelayEndTurn()
+    {
+        Debug.Log("IsAttackingAnimation(DelayEndTurn): " + playerStats.player.isAttackingAnimation);
+        yield return new WaitUntil(() => !playerStats.player.isAttackingAnimation); // Aguarda ataque terminar
+
+        yield return new WaitForSeconds(1f);
+
+        if(!playerTurn)
+            UI_Manager.instance.HideBlockHandCards();
+
         playerTurn = !playerTurn;
 
         StartTurn();
@@ -79,26 +100,42 @@ public class BattleManager : MonoBehaviour
     public void ForceEndTurn()
     {
         if (playerTurn)
-        EndTurn();
+            EndTurn();
     }
 
     private IEnumerator EnemyTurn()
     {
-        yield return new WaitForSeconds(0.5f);
+        UI_Manager.instance.ShowBlockHandCards();
+        yield return new WaitForSeconds(0.9f);
 
         for (int i = 0; i < enemies.Length; i++)
         {
             CharacterStats enemy = enemies[i];
+            
+            yield return new WaitForSeconds(0.4f); // Delay entre os ataques dos inimigos
             if (enemy.currentHealth > 0 && enemy != null)
             {
-                int enemyDamage = enemy.damage.GetValue();
+                int enemyDamage = enemy.damage.GetValue(); // Dano do inimigo
 
-                if (playerStats.TargetCanAvoidAttack(enemy))
+                if (playerStats.TargetCanAvoidAttack(playerStats)) // Se o player esquivar
                 {
                     enemyDamage = 0;
                 }
-                playerStats.TakeDamage(enemyDamage); // Dano fixo de 10, altere conforme necessário
-                yield return new WaitForSeconds(0.5f); // Pequeno delay para ver cada ataque
+
+                PlayetAnimationsOnEnemyTurn(enemyDamage);
+
+                isPlayerTakingHit = true;
+
+                Enemy enemyAnimator = enemy.GetComponent<Enemy>();
+                enemyAnimator.enemyAnim.SetTrigger("Attack"); // Animação de ataque do inimigo
+
+                yield return new WaitForSeconds(0.2f); // Delay para o hit DamageText aparecer
+                playerStats.TakeDamage(enemyDamage); // Aplica o dano
+
+
+
+                yield return new WaitUntil(() => !isPlayerTakingHit); // Espera a animação terminar
+
             }
             else
             {
@@ -106,9 +143,55 @@ public class BattleManager : MonoBehaviour
             }
         }
 
-        
-
+        //Debug.Log("HideBlockHandCards sendo chamado no BattleManager");
+        //UI_Manager.instance.HideBlockHandCards();
         EndTurn(); // Termina o turno dos inimigos após todos atacarem
+    }
+
+    private void PlayetAnimationsOnEnemyTurn(int enemyDamage)
+    {
+        if (enemyDamage == 0)
+        {
+            TriggerPlayerEvasionAnimation(); // Animação de esquiva
+        }
+        else if (enemyDamage <= playerStats.shield)
+        {
+            TriggerPlayerBlockAnimation(); // Animação de bloqueio
+        }
+        else
+        {
+            TriggerPlayerHitAnimation(); // Animação de hit normal
+        }
+    }
+
+    private void TriggerPlayerHitAnimation()
+    {
+        Animator playerAnimator = playerStats.GetComponentInChildren<Animator>();
+        if (playerAnimator != null)
+        {
+            playerAnimator.SetTrigger("Hit");
+        }
+    }
+    private void TriggerPlayerBlockAnimation()
+    {
+        Animator playerAnimator = playerStats.GetComponentInChildren<Animator>();
+        if (playerAnimator != null)
+        {
+            playerAnimator.SetTrigger("Block");
+        }
+    }
+    private void TriggerPlayerEvasionAnimation()
+    {
+        Animator playerAnimator = playerStats.GetComponentInChildren<Animator>();
+        if (playerAnimator != null)
+        {
+            playerAnimator.SetTrigger("Evade");
+        }
+    }
+
+    public void OnPlayerHitAnimationEnd()
+    {
+        isPlayerTakingHit = false;
     }
 
     public void VerifyPlayerIsAlive()
@@ -137,26 +220,36 @@ public class BattleManager : MonoBehaviour
 
     private void UseCard(CardData cardData)
     {
-        if(playerTurn && playerStats.energy >= cardData.energyCost)
+        if (playerTurn && playerStats.energy >= cardData.energyCost)
         {
             playerStats.energy -= cardData.energyCost;
             UpdateEnergyText();
 
+            /* if (playerStats.energy <= 0)
+                 EndTurn();*/
             if (playerStats.energy <= 0)
-                EndTurn();
+                StartCoroutine(DelayCallEndTurn());
         }
     }
 
-    private void UseCardAttack(Enemy_Stats enemyTarget,CardData cardData)
+    private void UseCardAttack(Enemy_Stats enemyTarget, CardData cardData)
     {
         if (playerTurn && playerStats.energy >= cardData.energyCost)
         {
             playerStats.energy -= cardData.energyCost;
             UpdateEnergyText();
 
+            /* if (playerStats.energy <= 0)
+                 EndTurn();*/
             if (playerStats.energy <= 0)
-                EndTurn();
+                StartCoroutine(DelayCallEndTurn());
         }
+    }
+
+    private IEnumerator DelayCallEndTurn()
+    {
+        yield return new WaitForSeconds(1f);
+        EndTurn();
     }
 
 

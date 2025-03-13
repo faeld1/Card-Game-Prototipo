@@ -65,6 +65,7 @@ public class PlayerStats : CharacterStats
         level++;
         currentXP -= xpToNextLevel;  // Reduz o XP necessário para o próximo nível
         xpToNextLevel = Mathf.RoundToInt(xpToNextLevel * xpGrowthFactor);  // Aumenta o XP necessário com base no fator de crescimento
+        player.PlayerFX.PlayLevelUpEffect();
         Debug.Log("Level Up! Novo nível: " + level);
     }
 
