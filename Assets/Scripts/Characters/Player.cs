@@ -40,7 +40,10 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
-        GetCurrentEnemyTarget();
+        if (CurrentEnemyTarget == null || CurrentEnemyTarget.currentHealth <= 0)
+        {
+            GetCurrentEnemyTarget();
+        }
     }
 
     public void SetTargetEnemy(Enemy_Stats targetEnemy)
@@ -54,6 +57,7 @@ public class Player : MonoBehaviour
     private void PlayerUseAttack(Enemy_Stats targetEnemy, CardData cardData)
     {
         if (isAttacking) return; // Bloqueia novas cartas enquanto estiver atacando
+
         if (CurrentEnemyTarget != null)
         {
             SetTargetEnemy(targetEnemy);
@@ -76,35 +80,17 @@ public class Player : MonoBehaviour
 
             if (target == null || target.currentHealth <= 0)
             {
-                if (target == null)
-                {
-                    Debug.Log("Target é null no StartNextAttack");
-                }
-                else
-                {
-                    Debug.Log("Target nao é nulo no StartNextAttack");
-                }
 
                 attackQueue.Dequeue();
                 GetCurrentEnemyTarget();
-
-                if(CurrentEnemyTarget == null)
-                {
-                    Debug.Log("CurrentEnemyTarget é null no StartNextAttack");
-                }
-
-                if(CurrentEnemyTarget.currentHealth <= 0)
-                {
-                    Debug.Log("CurrentEnemyTarget.currentHealth <= 0 no StartNextAttack");
-                }
 
                 if (CurrentEnemyTarget != null && CurrentEnemyTarget.currentHealth > 0)
                 {
                     attackQueue.Enqueue(CurrentEnemyTarget);
                     target = CurrentEnemyTarget;
-                    Debug.Log("Terceiro if do StartnextAttack chamado");
+                    //Debug.Log("Terceiro if do StartnextAttack chamado");
                 }
-                Debug.Log("Segundo if do StartnextAttack chamado");
+               // Debug.Log("Segundo if do StartnextAttack chamado");
             }
 
             if (target != null && target.currentHealth > 0)
@@ -121,7 +107,7 @@ public class Player : MonoBehaviour
             {
                 isAttacking = false;
                 animator.SetBool("IsAttacking", false);
-                Debug.Log("HideBlockHandCards sendo chamado no StartNextAttack");
+                //Debug.Log("HideBlockHandCards sendo chamado no StartNextAttack");
                 UI_Manager.instance.HideBlockHandCards();
             }
         }
@@ -129,10 +115,11 @@ public class Player : MonoBehaviour
         {
             isAttacking = false;
             animator.SetBool("IsAttacking", false);
-            Debug.Log("RemainingAttacks <= 0 no StartNextAttack");
+           // Debug.Log("RemainingAttacks <= 0 no StartNextAttack");
         }
 
     }
+
 
     // Esta função será chamada no fim da animação via Animation Event
     public void OnAttackAnimationEnd()
@@ -149,12 +136,13 @@ public class Player : MonoBehaviour
             return;
         }
 
-        // Se não há alvo ou ele morreu, buscar o próximo
-        if (CurrentEnemyTarget == null || CurrentEnemyTarget.currentHealth <= 0)
+        // Remove o inimigo morto da lista
+        if (CurrentEnemyTarget != null && CurrentEnemyTarget.currentHealth <= 0)
         {
-            _enemies.Remove(CurrentEnemyTarget); // Remove da lista de inimigos
-            GetCurrentEnemyTarget(); // Pega o próximo da fila
+            _enemies.Remove(CurrentEnemyTarget);
         }
+
+        GetCurrentEnemyTarget();
 
         // Se ainda temos um inimigo válido, atacar
         if (CurrentEnemyTarget != null && CurrentEnemyTarget.currentHealth > 0)
@@ -250,6 +238,9 @@ public class Player : MonoBehaviour
 
     private void GetCurrentEnemyTarget()
     {
+        // Remove inimigos nulos ou mortos
+        _enemies.RemoveAll(enemy => enemy == null || enemy.currentHealth <= 0);
+
         if (_enemies.Count <= 0 && gameStarted)
         {
             CurrentEnemyTarget = null;
@@ -257,7 +248,6 @@ public class Player : MonoBehaviour
             return;
         }
 
-        // Se já temos um alvo válido, não alterar
         if (CurrentEnemyTarget != null && CurrentEnemyTarget.currentHealth > 0)
         {
             return;
@@ -266,16 +256,9 @@ public class Player : MonoBehaviour
         Enemy_Stats closestEnemy = null;
         float closestDistance = Mathf.Infinity;
 
-        // Remove inimigos destruídos antes de calcular o mais próximo
-        _enemies.RemoveAll(enemy => enemy == null);
-
         foreach (var enemy in _enemies)
         {
-            // Confere se o inimigo ainda existe antes de acessar suas propriedades
-            if (enemy == null) continue;
-
             float distanceToEnemy = Vector3.Distance(transform.position, enemy.transform.position);
-
             if (distanceToEnemy < closestDistance)
             {
                 closestDistance = distanceToEnemy;
@@ -284,7 +267,6 @@ public class Player : MonoBehaviour
         }
 
         CurrentEnemyTarget = closestEnemy;
-
     }
 
     private void OnTriggerEnter(Collider collision)

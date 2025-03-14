@@ -10,6 +10,7 @@ public class HealthBar : MonoBehaviour
     private Player player;
 
     private bool allowVerify = false;
+    private bool isDead = false;
 
     private void Start()
     {
@@ -32,10 +33,12 @@ public class HealthBar : MonoBehaviour
 
         if (myStats.currentHealth <= 0)
         {
-            Destroy(myStats.gameObject);
-            if (enemy != null)
+            //Destroy(myStats.gameObject);
+            if (this.enemy != null && !isDead)
             {
-                enemy.enemyAnim.SetTrigger("Death");
+                this.enemy.enemyAnim.SetTrigger("Death");
+                isDead = true;
+                Debug.Log("Enemy Death Animation");
             }
             if(player != null)
             {
@@ -44,7 +47,7 @@ public class HealthBar : MonoBehaviour
 
             this.slider.gameObject.SetActive(false);
             
-            //StartCoroutine(DeathWithDelay());
+            StartCoroutine(DeathWithDelay());
         }
 
         allowVerify = true;
