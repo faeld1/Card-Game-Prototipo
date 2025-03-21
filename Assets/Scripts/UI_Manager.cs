@@ -1,19 +1,29 @@
 using System.Collections;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class UI_Manager : MonoBehaviour
 {
     public static UI_Manager instance;
 
+    public TextMeshProUGUI rageText;
+    public Button specialAttackButton;
+
     public RectTransform endGameContainer;
     [SerializeField]private RectTransform blockHandCardsContainer;
+    [SerializeField] private RectTransform victoryContainer;
 
+    [SerializeField]private float endGameCallDelay = 1f;
     private Vector2 ShowEndGameContainerPosition;
     private Vector2 hiddenEndGamePosition;
 
     private Vector2 blockHandCardsPosition;
     private Vector2 hiddenBlockHandCardsPosition;
+
+    private Vector2 victoryContainerPosition;
+    private Vector2 hiddenVictoryContainerPosition;
     private void Awake()
     {
         if (instance == null)
@@ -28,14 +38,32 @@ public class UI_Manager : MonoBehaviour
 
     private void Start()
     {
-        ShowEndGameContainerPosition = new Vector2 (0, 0);
+        SetupUIContainers();
+
+        HideEndGame();
+        blockHandCardsContainer.anchoredPosition = hiddenBlockHandCardsPosition; //esconde as cartas de bloqueio
+
+        specialAttackButton.onClick.AddListener(() => BattleManager.instance.playerStats.player.UseSpecialAttack());
+
+        UpdateRageUI(0);
+    }
+    public void UpdateRageUI(int rage)
+    {
+        rageText.text = "Raiva: " + rage;
+        specialAttackButton.interactable = rage >= 3;
+    }
+
+    private void SetupUIContainers()
+    {
+        ShowEndGameContainerPosition = new Vector2(0, 0);
         hiddenEndGamePosition = ShowEndGameContainerPosition + new Vector2(0, -1100);
 
         blockHandCardsPosition = blockHandCardsContainer.anchoredPosition;
         hiddenBlockHandCardsPosition = blockHandCardsPosition + new Vector2(0, -1100);
 
-        HideEndGame();
-        blockHandCardsContainer.anchoredPosition = hiddenBlockHandCardsPosition; //esconde as cartas de bloqueio
+        victoryContainerPosition = victoryContainer.anchoredPosition;
+        hiddenVictoryContainerPosition = new Vector2(0, 700);
+        victoryContainer.anchoredPosition = hiddenVictoryContainerPosition;
     }
 
     public void HideBlockHandCards()
@@ -55,6 +83,10 @@ public class UI_Manager : MonoBehaviour
         //Debug.Log("HideBlockHandsCards chamado");
         blockHandCardsContainer.anchoredPosition = hiddenBlockHandCardsPosition;
     }
+    private void ShowVictoryContainer()
+    {
+        victoryContainer.anchoredPosition = victoryContainerPosition;
+    }
 
     public void ExitScene()
     {
@@ -73,7 +105,10 @@ public class UI_Manager : MonoBehaviour
 
     private IEnumerator ShowEndGameDelay()
     {
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(endGameCallDelay);
+        ShowVictoryContainer();
+
+        yield return new WaitForSeconds(1.5f);
         MoveEndGame(ShowEndGameContainerPosition);
         endGameContainer.gameObject.SetActive(true);
     }

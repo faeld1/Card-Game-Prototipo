@@ -54,6 +54,23 @@ public class PlayerFX : MonoBehaviour
 
             newInstance.transform.position = textDamageSpawnPosition.position + randomPosition;
             newInstance.SetActive(true);
+
+            //Hit Effect
+            float randomEffectX = Random.Range(-0.5f, 0.5f);
+            float randomEffectY = Random.Range(0f, 1f);
+
+            Vector3 randomEffectPosition = new Vector3(randomEffectX, randomEffectY, -0.5f);
+
+            GameObject hitEffectInstance = HitFxManager.instance.Pooler.GetInstanceFromPool();
+            if (hitEffectInstance == null)
+            {
+                Debug.LogError("Hit Effect retornou NULL! Verifique se o Pooler está configurado corretamente.");
+                return;
+            }
+
+            hitEffectInstance.transform.localScale = Vector3.one * 0.7f; // Reduz tamanho original
+            hitEffectInstance.transform.position = selectedEffect.transform.position + randomEffectPosition;
+            hitEffectInstance.SetActive(true);
         }
     }
 

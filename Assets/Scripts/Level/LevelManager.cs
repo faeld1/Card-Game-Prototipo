@@ -44,7 +44,7 @@ public class LevelManager : MonoBehaviour
     {
         currentSubLevelIndex++;
 
-        if (currentSubLevelIndex > subLevelTimes) // Terminou todos os subníveis
+        if (currentSubLevelIndex > subLevelTimes) // Terminou todos os subníveis - Ganhou o level
         {
             Debug.Log("Level Complete!");
             SaveLevelProgress(currentLevel.levelNumber);
@@ -57,6 +57,7 @@ public class LevelManager : MonoBehaviour
 
             return;
         }
+        //Ganhou o subnivel
 
         UI_Manager.instance.ShowEndGame();
         DeckManager.instance.HideHand();

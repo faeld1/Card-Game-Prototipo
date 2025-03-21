@@ -371,7 +371,7 @@ MonoBehaviour:
     baseValue: 100
     modifiers: 
   evasion:
-    baseValue: 0
+    baseValue: 50
     modifiers: 
   armor:
     baseValue: 0
@@ -381,6 +381,7 @@ MonoBehaviour:
   currentHealth: 0
   shield: 0
   player: {fileID: 0}
+  enemy: {fileID: 0}
   xpReward: 5
 --- !u!114 &1161246321100879264
 MonoBehaviour:
@@ -673,6 +674,10 @@ PrefabInstance:
       propertyPath: m_Controller
       value: 
       objectReference: {fileID: 9100000, guid: f114fcc1d71de814e9f2e09a08c792d2, type: 2}
+    - target: {fileID: 5866666021909216657, guid: 625e22d7f3f7a8d4a8f6e3eb6bc77e0f, type: 3}
+      propertyPath: m_ApplyRootMotion
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

@@ -14,6 +14,11 @@ public class PlayerAnimationEvents : MonoBehaviour
         player.OnAttackAnimationEnd();
     }
 
+    public void EndSpecialAttackAnimation()
+    {
+        player.OnSpecialAttackAnimationEnd();
+    }
+
     public void EndHitAnimation()
     {
         player.OnHitAnimationEnd();

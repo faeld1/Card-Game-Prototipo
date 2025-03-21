@@ -39,11 +39,18 @@ public class EnemyFX : MonoBehaviour
 
             if (crit)
                 damageText.color = Color.red;
+            else
+                damageText.color = Color.white;
 
-            if(damage == 0)
+            if (damage == 0)
             {
                 damageText.text = "Miss";
                 damageText.color = Color.white;
+                enemy.enemy.enemyAnim.SetTrigger("Evasion"); // Animação de esquiva
+            }
+            else
+            {
+                enemy.enemy.enemyAnim.SetTrigger("Hit"); // Animação de dano recebido
             }
 
             newInstance.transform.position = textDamageSpawnPosition.position+randomPosition;

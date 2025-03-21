@@ -18,6 +18,11 @@ public class Player : MonoBehaviour
     public float AttackRange => attackRange;
     private bool gameStarted;
 
+    [Header("Special Attacks")]
+    private Queue<Enemy_Stats> specialAttackQueue = new Queue<Enemy_Stats>();
+    private int remainingSpecialAttacks = 0;
+    private bool isSpecialAttacking = false;
+
     [Header("Player Attacking")]
     private bool isAttacking = false;
     public bool isAttackingAnimation = false;
@@ -46,14 +51,7 @@ public class Player : MonoBehaviour
         }
     }
 
-    public void SetTargetEnemy(Enemy_Stats targetEnemy)
-    {
-        if (targetEnemy != null && targetEnemy.currentHealth > 0)
-        {
-            CurrentEnemyTarget = targetEnemy;
-        }
-    }
-
+    #region Attack from Cards
     private void PlayerUseAttack(Enemy_Stats targetEnemy, CardData cardData)
     {
         if (isAttacking) return; // Bloqueia novas cartas enquanto estiver atacando
@@ -73,7 +71,7 @@ public class Player : MonoBehaviour
     }
     private void StartNextAttack()
     {
-        Debug.Log("StartNextAttack chamado. RemainingAttacks: " + remainingAttacks + " | Queue Size: " + attackQueue.Count);
+        //Debug.Log("StartNextAttack chamado. RemainingAttacks: " + remainingAttacks + " | Queue Size: " + attackQueue.Count);
         if (remainingAttacks > 0 && attackQueue.Count > 0)
         {
             Enemy_Stats target = attackQueue.Peek();
@@ -148,6 +146,7 @@ public class Player : MonoBehaviour
         if (CurrentEnemyTarget != null && CurrentEnemyTarget.currentHealth > 0)
         {
             Stats.DoDamage(CurrentEnemyTarget);
+            GainRage();
             remainingAttacks--;
 
             // Se ainda há ataques restantes, continuar
@@ -183,6 +182,7 @@ public class Player : MonoBehaviour
             isAttackingAnimation = false;
         }
     }
+    #endregion 
     public void OnHitAnimationEnd()
     {
         BattleManager.instance.OnPlayerHitAnimationEnd();
@@ -222,6 +222,134 @@ public class Player : MonoBehaviour
         }
     }
 
+    #region Special Attack
+
+    // Chamado sempre que o player ataca
+    public void GainRage()
+    {
+        BattleManager.instance.rageStacks++;
+        UI_Manager.instance.UpdateRageUI(BattleManager.instance.rageStacks); // Atualiza UI
+    }
+
+    // Chamado quando o botão de ataque especial é pressionado
+    public void UseSpecialAttack()
+    {
+        int rageStacks = BattleManager.instance.rageStacks;
+
+        if (rageStacks >= 3) // Se a raiva for maior ou igual a 3
+        {
+            remainingSpecialAttacks = rageStacks; // Define a quantidade de ataques
+            //rageStacks = 0; // Reseta a raiva
+            BattleManager.instance.rageStacks = 0;
+            UI_Manager.instance.UpdateRageUI(BattleManager.instance.rageStacks);
+
+            isSpecialAttacking = true;
+            specialAttackQueue.Clear();
+
+            // Adiciona o inimigo atual na fila
+            if (CurrentEnemyTarget != null && CurrentEnemyTarget.currentHealth > 0)
+            {
+                specialAttackQueue.Enqueue(CurrentEnemyTarget);
+            }
+
+            StartNextSpecialAttack();
+        }
+        else
+        {
+            Debug.Log("Raiva insuficiente para ataque especial!");
+        }
+    }
+    private void StartNextSpecialAttack()
+    {
+        if (remainingSpecialAttacks > 0 && specialAttackQueue.Count > 0)
+        {
+            Enemy_Stats target = specialAttackQueue.Peek();
+
+            if (target == null || target.currentHealth <= 0)
+            {
+                specialAttackQueue.Dequeue();
+                GetCurrentEnemyTarget();
+                if (CurrentEnemyTarget != null && CurrentEnemyTarget.currentHealth > 0)
+                {
+                    specialAttackQueue.Enqueue(CurrentEnemyTarget);
+                    target = CurrentEnemyTarget;
+                }
+            }
+
+            if (target != null && target.currentHealth > 0)
+            {
+                animator.SetBool("IsAttacking", true);
+                // Escolhe um número aleatório entre 1 e 3
+                int randomAttack = UnityEngine.Random.Range(1, 4);
+
+                // Ativa um dos três triggers
+                animator.SetTrigger("Attack_" + randomAttack);
+            }
+            else
+            {
+                isSpecialAttacking = false;
+                animator.SetBool("IsAttacking", false);
+            }
+        }
+        else
+        {
+            isSpecialAttacking = false;
+            animator.SetBool("IsAttacking", false);
+        }
+    }
+
+    public void OnSpecialAttackAnimationEnd()
+    {
+        if (remainingSpecialAttacks <= 0)
+        {
+            isSpecialAttacking = false;
+            animator.SetBool("IsAttacking", false);
+            UI_Manager.instance.HideBlockHandCards();
+            return;
+        }
+
+        // Aplica dano ao inimigo atual
+        if (CurrentEnemyTarget != null && CurrentEnemyTarget.currentHealth > 0)
+        {
+            Stats.DoDamage(CurrentEnemyTarget);
+        }
+
+        remainingSpecialAttacks--;
+        StartNextSpecialAttack();
+    }
+
+
+
+    private IEnumerator PerformSpecialAttack(int attackCount)
+    {
+        isAttacking = true;
+
+        for (int i = 0; i < attackCount; i++)
+        {
+            if (CurrentEnemyTarget == null || CurrentEnemyTarget.currentHealth <= 0)
+            {
+                GetCurrentEnemyTarget();
+            }
+
+            if (CurrentEnemyTarget != null && CurrentEnemyTarget.currentHealth > 0)
+            {
+                animator.SetBool("IsAttacking", true);
+
+                // Escolhe um número aleatório entre 1 e 3
+                int randomAttack = UnityEngine.Random.Range(1, 4);
+
+                // Ativa um dos três triggers
+                animator.SetTrigger("Attack_" + randomAttack);
+                Stats.DoDamage(CurrentEnemyTarget);
+                yield return new WaitForSeconds(0.5f); // Pequeno delay entre os ataques
+            }
+        }
+        animator.SetBool("IsAttacking", false);
+        isAttacking = false;
+    }
+
+    #endregion
+
     private void HealPlayer(CardData cardData)
     {
         animator.SetTrigger("Heal");
@@ -236,6 +364,14 @@ public class Player : MonoBehaviour
         gameStarted = true;
     }
 
+    #region GET ENEMY TARGET
+    public void SetTargetEnemy(Enemy_Stats targetEnemy)
+    {
+        if (targetEnemy != null && targetEnemy.currentHealth > 0)
+        {
+            CurrentEnemyTarget = targetEnemy;
+        }
+    }
     private void GetCurrentEnemyTarget()
     {
         // Remove inimigos nulos ou mortos
@@ -295,6 +431,8 @@ public class Player : MonoBehaviour
         }
     }
 
+    #endregion
+
     private void OnEnable()
     {
         DeckManager.OnCardUsed += PlayerUseDefenseOrSupport;
@@ -309,7 +447,6 @@ public class Player : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-
         SphereCollider sphereCollider = GetComponent<SphereCollider>();
 
         sphereCollider.radius = attackRange;

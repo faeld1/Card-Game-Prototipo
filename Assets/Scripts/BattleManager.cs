@@ -9,6 +9,9 @@ public class BattleManager : MonoBehaviour
     public CharacterStats playerStats;
     public CharacterStats[] enemies;
 
+    [Header("Special")]
+    public int rageStacks = 0; //Contador de Raiva
+
     public TextMeshProUGUI howTurnText;
 
     private bool playerTurn = true;
@@ -19,6 +22,7 @@ public class BattleManager : MonoBehaviour
     private int startShield = 0;
 
     private bool isPlayerTakingHit = false;
+    [SerializeField]private bool autoEndTurn = false;
 
     [SerializeField] private TextMeshProUGUI energyText;
 
@@ -54,6 +58,12 @@ public class BattleManager : MonoBehaviour
 
             if (startShield > 1)
                 playerStats.ResetShield(); //Reseta escudo
+
+            if (rageStacks >= 3)
+            {
+                rageStacks /= 2; // Reduz pela metade (arredondando para baixo)
+                UI_Manager.instance.UpdateRageUI(rageStacks);
+            }
         }
         else
         {
@@ -97,7 +107,7 @@ public class BattleManager : MonoBehaviour
         StartTurn();
     }
 
-    public void ForceEndTurn()
+    public void ForceEndTurn() //EndTurn no Botao
     {
         if (playerTurn)
             EndTurn();
@@ -112,7 +122,7 @@ public class BattleManager : MonoBehaviour
         {
             CharacterStats enemy = enemies[i];
             
-            yield return new WaitForSeconds(0.4f); // Delay entre os ataques dos inimigos
+            yield return new WaitForSeconds(0.6f); // Delay entre os ataques dos inimigos
             if (enemy.currentHealth > 0 && enemy != null)
             {
                 int enemyDamage = enemy.damage.GetValue(); // Dano do inimigo
@@ -122,7 +132,7 @@ public class BattleManager : MonoBehaviour
                     enemyDamage = 0;
                 }
 
-                PlayetAnimationsOnEnemyTurn(enemyDamage);
+                PlayerAnimationsOnEnemyTurn(enemyDamage);
 
                 isPlayerTakingHit = true;
 
@@ -148,7 +158,7 @@ public class BattleManager : MonoBehaviour
         EndTurn(); // Termina o turno dos inimigos após todos atacarem
     }
 
-    private void PlayetAnimationsOnEnemyTurn(int enemyDamage)
+    private void PlayerAnimationsOnEnemyTurn(int enemyDamage)
     {
         if (enemyDamage == 0)
         {
@@ -227,7 +237,7 @@ public class BattleManager : MonoBehaviour
 
             /* if (playerStats.energy <= 0)
                  EndTurn();*/
-            if (playerStats.energy <= 0)
+            if (playerStats.energy <= 0 && autoEndTurn)
                 StartCoroutine(DelayCallEndTurn());
         }
     }
@@ -239,9 +249,7 @@ public class BattleManager : MonoBehaviour
             playerStats.energy -= cardData.energyCost;
             UpdateEnergyText();
 
-            /* if (playerStats.energy <= 0)
-                 EndTurn();*/
-            if (playerStats.energy <= 0)
+            if (playerStats.energy <= 0 && autoEndTurn)
                 StartCoroutine(DelayCallEndTurn());
         }
     }

@@ -37,20 +37,21 @@ public class HealthBar : MonoBehaviour
             if (this.enemy != null && !isDead)
             {
                 this.enemy.enemyAnim.SetTrigger("Death");
+                this.enemy.enemyAnim.SetBool("IsDead", true);
                 isDead = true;
                 Debug.Log("Enemy Death Animation");
             }
-            if(player != null)
+            if (player != null)
             {
                 player.animator.SetTrigger("Death");
             }
 
             this.slider.gameObject.SetActive(false);
-            
+
             StartCoroutine(DeathWithDelay());
         }
 
-        allowVerify = true;
+            allowVerify = true;
 
     }
     private IEnumerator DeathWithDelay()
