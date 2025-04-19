@@ -74,6 +74,8 @@ public class Player : MonoBehaviour
         //Debug.Log("StartNextAttack chamado. RemainingAttacks: " + remainingAttacks + " | Queue Size: " + attackQueue.Count);
         if (remainingAttacks > 0 && attackQueue.Count > 0)
         {
+            UI_Manager.instance.endTurnButton.interactable = false;
+            UI_Manager.instance.specialAttackButton.interactable = false;
             Enemy_Stats target = attackQueue.Peek();
 
             if (target == null || target.currentHealth <= 0)
@@ -88,7 +90,7 @@ public class Player : MonoBehaviour
                     target = CurrentEnemyTarget;
                     //Debug.Log("Terceiro if do StartnextAttack chamado");
                 }
-               // Debug.Log("Segundo if do StartnextAttack chamado");
+                // Debug.Log("Segundo if do StartnextAttack chamado");
             }
 
             if (target != null && target.currentHealth > 0)
@@ -113,7 +115,7 @@ public class Player : MonoBehaviour
         {
             isAttacking = false;
             animator.SetBool("IsAttacking", false);
-           // Debug.Log("RemainingAttacks <= 0 no StartNextAttack");
+            // Debug.Log("RemainingAttacks <= 0 no StartNextAttack");
         }
 
     }
@@ -122,15 +124,22 @@ public class Player : MonoBehaviour
     // Esta função será chamada no fim da animação via Animation Event
     public void OnAttackAnimationEnd()
     {
+        if (!isAttacking)
+            return;
 
         isAttackingAnimation = true;
         if (remainingAttacks <= 0)
         {
             //Debug.Log("HideBlockHandCards sendo chamado no remaingAttack = 0 do OnAttackAnimationEnd");
-            UI_Manager.instance.HideBlockHandCards();
+            if (Stats.energy > 0)
+                UI_Manager.instance.HideBlockHandCards();
+
             isAttacking = false;
             isAttackingAnimation = false;
             animator.SetBool("IsAttacking", false);
+            UI_Manager.instance.endTurnButton.interactable = true;
+            if (BattleManager.instance.rageStacks >= 3)
+                UI_Manager.instance.specialAttackButton.interactable = true;
             return;
         }
 
@@ -159,19 +168,22 @@ public class Player : MonoBehaviour
                 //Debug.Log("PlayerCurrentEnergy: " + BattleManager.instance.PlayerCurrentEnergy);
                 if (BattleManager.instance.PlayerCurrentEnergy > 0)
                 {
-                    //Debug.Log("HideBlockHandCards sendo chamado no primeiro else do OnAttackAnimationEnd");
+                    Debug.Log("HideBlockHandCards sendo chamado no primeiro else do OnAttackAnimationEnd");
                     UI_Manager.instance.HideBlockHandCards();
                 }
                 else
+                {
                     UI_Manager.instance.ShowBlockHandCards();
+                }
 
+                //UI_Manager.instance.endTurnButton.interactable = true;
                 isAttacking = false;
                 animator.SetBool("IsAttacking", false);
             }
         }
         else
         {
-            //Debug.Log("HideBlockHandCards sendo chamado no segundo else do OnAttackAnimationEnd");
+            Debug.Log("HideBlockHandCards sendo chamado no segundo else do OnAttackAnimationEnd");
             UI_Manager.instance.HideBlockHandCards();
             isAttacking = false;
             animator.SetBool("IsAttacking", false);
@@ -180,6 +192,9 @@ public class Player : MonoBehaviour
         if (remainingAttacks <= 0)
         {
             isAttackingAnimation = false;
+            UI_Manager.instance.endTurnButton.interactable = true;
+            if(BattleManager.instance.rageStacks >= 3)
+                UI_Manager.instance.specialAttackButton.interactable = true;
         }
     }
     #endregion 
@@ -189,14 +204,15 @@ public class Player : MonoBehaviour
     }
     public void OnSupportAnimationEnd()
     {
-        //Debug.Log("HideBlockHandCards sendo chamado no OnSupportAnimationEnd");
-        UI_Manager.instance.HideBlockHandCards();
+        if (Stats.energy > 0)
+            UI_Manager.instance.HideBlockHandCards();
     }
 
     private void PlayerUseDefenseOrSupport(CardData cardData)
     {
         if (cardData.cardType == CardType.Defense)
         {
+            Debug.Log("Carta de defesa sendo usada");
             Stats.IncreaseShield(cardData.defenseValue);
             UI_Manager.instance.ShowBlockHandCards();
             animator.SetTrigger("Shield");
@@ -206,7 +222,6 @@ public class Player : MonoBehaviour
             if (cardData.grantsEnergy)
             {
                 Stats.IncreasyEnergy(cardData.energyGranted);
-                //Debug.Log("HideBlockHandCards sendo chamado no PlayerUseDefenseOrSupport");
                 UI_Manager.instance.HideBlockHandCards();
             }
 
@@ -261,6 +276,7 @@ public class Player : MonoBehaviour
     }
     private void StartNextSpecialAttack()
     {
+        UI_Manager.instance.endTurnButton.interactable = false;
         if (remainingSpecialAttacks > 0 && specialAttackQueue.Count > 0)
         {
             Enemy_Stats target = specialAttackQueue.Peek();
@@ -295,16 +311,30 @@ public class Player : MonoBehaviour
         {
             isSpecialAttacking = false;
             animator.SetBool("IsAttacking", false);
+            UI_Manager.instance.endTurnButton.interactable = true;
         }
     }
 
     public void OnSpecialAttackAnimationEnd()
     {
+        if (!isSpecialAttacking)
+            return;
+
         if (remainingSpecialAttacks <= 0)
         {
             isSpecialAttacking = false;
             animator.SetBool("IsAttacking", false);
-            UI_Manager.instance.HideBlockHandCards();
+            UI_Manager.instance.endTurnButton.interactable = true;
+
+            if (Stats.energy > 0)
+            {
+                Debug.Log("Player energy: " + Stats.energy);
+                UI_Manager.instance.HideBlockHandCards();
+
+            }
+            else
+                UI_Manager.instance.ShowBlockHandCards();
+
             return;
         }
 
@@ -318,35 +348,6 @@ public class Player : MonoBehaviour
         StartNextSpecialAttack();
     }
 
-
-
-    private IEnumerator PerformSpecialAttack(int attackCount)
-    {
-        isAttacking = true;
-
-        for (int i = 0; i < attackCount; i++)
-        {
-            if (CurrentEnemyTarget == null || CurrentEnemyTarget.currentHealth <= 0)
-            {
-                GetCurrentEnemyTarget();
-            }
-
-            if (CurrentEnemyTarget != null && CurrentEnemyTarget.currentHealth > 0)
-            {
-                animator.SetBool("IsAttacking", true);
-
-                // Escolhe um número aleatório entre 1 e 3
-                int randomAttack = UnityEngine.Random.Range(1, 4);
-
-                // Ativa um dos três triggers
-                animator.SetTrigger("Attack_" + randomAttack);
-                Stats.DoDamage(CurrentEnemyTarget);
-                yield return new WaitForSeconds(0.5f); // Pequeno delay entre os ataques
-            }
-        }
-        animator.SetBool("IsAttacking", false);
-        isAttacking = false;
-    }
 
     #endregion
 

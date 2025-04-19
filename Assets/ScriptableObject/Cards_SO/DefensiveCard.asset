@@ -21,3 +21,7 @@ MonoBehaviour:
   cardType: 1
   evolvedCard: {fileID: 11400000, guid: cf693d6b64998f249905059ae4a9db73, type: 2}
   isTemporary: 0
+  grantsEnergy: 0
+  healsPlayer: 0
+  healPercentage: 0
+  energyGranted: 0

@@ -211,7 +211,6 @@ public class DeckManager : MonoBehaviour
         DrawInitialHand(); // Desenha novas cartas para a mão
     }
 
-
     public void UpdateUI()
     {
         // Verifica e atualiza mainDeckSlot e discardPileSlot com base em cardBack ou emptySlotSprite
@@ -240,6 +239,7 @@ public class DeckManager : MonoBehaviour
                         break;
                     case CardType.Support:
                         cardValueText = "Suporte"; // Ou outro valor ou símbolo específico para suporte
+                        textColor = Color.green;
                         break;
                 }
 

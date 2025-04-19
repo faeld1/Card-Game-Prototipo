@@ -422,9 +422,12 @@ MonoBehaviour:
   upgradeButtonPrefab: {fileID: 3727535838897300585, guid: 4666354bc519c2a4e85dec576a498c69, type: 3}
   skipButton: {fileID: 529853550}
   availableCards:
-  - {fileID: 11400000, guid: a521964c008d72743801cc4415d25c60, type: 2}
-  - {fileID: 11400000, guid: cb11f2afea5dcf246a09113f754f47ce, type: 2}
-  - {fileID: 11400000, guid: 258f8f01b8976944aa4c36a1181c6d5c, type: 2}
+  - {fileID: 11400000, guid: 4a65a251c5557714bbdb4d06b8bb216f, type: 2}
+  - {fileID: 11400000, guid: 591168ccba7196048b22cb3f02c0b603, type: 2}
+  - {fileID: 11400000, guid: 4888163779dd8e848861d3316a96ee76, type: 2}
+  - {fileID: 11400000, guid: 578b4ef6b8fe3a2428d52f86488ef105, type: 2}
+  - {fileID: 11400000, guid: 33b68a29565525842a08e83de67e75ba, type: 2}
+  - {fileID: 11400000, guid: a456bd45ab97c1f4d8d91c75824e98b2, type: 2}
 --- !u!1 &482817133
 GameObject:
   m_ObjectHideFlags: 0

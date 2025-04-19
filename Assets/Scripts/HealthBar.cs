@@ -1,4 +1,5 @@
 using System.Collections;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,6 +10,8 @@ public class HealthBar : MonoBehaviour
     private Enemy enemy;
     private Player player;
 
+    private TextMeshProUGUI healthText;
+
     private bool allowVerify = false;
     private bool isDead = false;
 
@@ -18,6 +21,7 @@ public class HealthBar : MonoBehaviour
         myStats = GetComponentInParent<CharacterStats>();
         enemy = GetComponentInParent<Enemy>();
         player = GetComponentInParent<Player>();
+        healthText = GetComponentInChildren<TextMeshProUGUI>();
 
         UpdateHealthUI();
     }
@@ -27,6 +31,8 @@ public class HealthBar : MonoBehaviour
     {
         slider.maxValue = myStats.maxHealth.GetValue();
         slider.value = myStats.currentHealth;
+
+        healthText.text = (myStats.currentHealth + "/" + myStats.maxHealth.GetValue());
 
         if (allowVerify)
             BattleManager.instance.VerifyPlayerIsAlive();
@@ -57,7 +63,7 @@ public class HealthBar : MonoBehaviour
     private IEnumerator DeathWithDelay()
     {
         Destroy(myStats);
-        yield return new WaitForSeconds(1.5f);
+        yield return new WaitForSeconds(1.8f);
         if (enemy != null)
         {
             Destroy(enemy.gameObject);

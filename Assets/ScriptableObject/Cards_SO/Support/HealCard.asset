@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cardName: Heal01
   description: 
-  energyCost: 0
+  energyCost: 1
   attackValue: 0
   defenseValue: 0
   cardSprite: {fileID: -809361918, guid: be55291aae08d434db3da3b59db3ab4a, type: 3}

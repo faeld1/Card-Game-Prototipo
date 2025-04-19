@@ -22,7 +22,7 @@ public class BattleManager : MonoBehaviour
     private int startShield = 0;
 
     private bool isPlayerTakingHit = false;
-    [SerializeField]private bool autoEndTurn = false;
+    [SerializeField] private bool autoEndTurn = false;
 
     [SerializeField] private TextMeshProUGUI energyText;
 
@@ -51,7 +51,8 @@ public class BattleManager : MonoBehaviour
         {
             howTurnText.text = "Turno do Player!";
             DeckManager.instance.ShowHand();
-           // UI_Manager.instance.HideBlockHandCards();
+            UI_Manager.instance.endTurnButton.interactable = true;
+            // UI_Manager.instance.HideBlockHandCards();
             playerStats.energy = playerBaseEnergy; //Reseta energia
 
             startShield++;
@@ -69,6 +70,8 @@ public class BattleManager : MonoBehaviour
         {
             howTurnText.text = "Turno do Enemy!";
             playerStats.energy = 0;
+            UI_Manager.instance.endTurnButton.interactable = false;
+            UI_Manager.instance.DisableArrow();
             //DeckManager.instance.HideHand();
             UI_Manager.instance.ShowBlockHandCards();
             StartCoroutine(DiscardHandDelay());
@@ -86,10 +89,10 @@ public class BattleManager : MonoBehaviour
 
     private void EndTurn()
     {
-        if(playerTurn)
+        if (playerTurn)
             UI_Manager.instance.ShowBlockHandCards();
-            
-        StartCoroutine(DelayEndTurn());     
+
+        StartCoroutine(DelayEndTurn());
     }
 
     private IEnumerator DelayEndTurn()
@@ -99,7 +102,7 @@ public class BattleManager : MonoBehaviour
 
         yield return new WaitForSeconds(1f);
 
-        if(!playerTurn)
+        if (!playerTurn)
             UI_Manager.instance.HideBlockHandCards();
 
         playerTurn = !playerTurn;
@@ -110,7 +113,10 @@ public class BattleManager : MonoBehaviour
     public void ForceEndTurn() //EndTurn no Botao
     {
         if (playerTurn)
+        {
             EndTurn();
+            UI_Manager.instance.DisableArrow();
+        }
     }
 
     private IEnumerator EnemyTurn()
@@ -121,7 +127,14 @@ public class BattleManager : MonoBehaviour
         for (int i = 0; i < enemies.Length; i++)
         {
             CharacterStats enemy = enemies[i];
-            
+
+            if (enemy != null)
+            {
+                EnemyFX fx = enemy.GetComponent<EnemyFX>();
+                fx.ShowTurnSelectionEffect(true); // Ativa o efeito de seleção do inimigo
+            }
+
+
             yield return new WaitForSeconds(0.6f); // Delay entre os ataques dos inimigos
             if (enemy.currentHealth > 0 && enemy != null)
             {
@@ -141,6 +154,7 @@ public class BattleManager : MonoBehaviour
 
                 yield return new WaitForSeconds(0.2f); // Delay para o hit DamageText aparecer
                 playerStats.TakeDamage(enemyDamage); // Aplica o dano
+                VerifyPlayerIsAlive();
 
 
 
@@ -149,7 +163,18 @@ public class BattleManager : MonoBehaviour
             }
             else
             {
+                if (enemy != null)
+                {
+                    EnemyFX fx = enemy.GetComponent<EnemyFX>();
+                    fx.ShowTurnSelectionEffect(false); // Ativa o efeito de seleção do inimigo
+                }
                 Debug.Log($"Enemy at index {i} is null or dead");
+            }
+
+            if (enemy != null)
+            {
+                EnemyFX fx = enemy.GetComponent<EnemyFX>();
+                fx.ShowTurnSelectionEffect(false); // Ativa o efeito de seleção do inimigo
             }
         }
 
@@ -212,7 +237,8 @@ public class BattleManager : MonoBehaviour
             {
                 Debug.Log("Player foi derrotado.");
                 gameOverOnce--;
-                LevelManager.Instance.ReturnToMenu(); // Vai direto para o menu principal em caso de derrota
+                //LevelManager.Instance.ReturnToMenu(); // Vai direto para o menu principal em caso de derrota
+                UI_Manager.instance.ShowEndGame(false);
             }
             else if (playerStats.player.CurrentEnemyTarget == null) // Vitória no último subnível
             {
@@ -235,10 +261,15 @@ public class BattleManager : MonoBehaviour
             playerStats.energy -= cardData.energyCost;
             UpdateEnergyText();
 
-            /* if (playerStats.energy <= 0)
-                 EndTurn();*/
-            if (playerStats.energy <= 0 && autoEndTurn)
-                StartCoroutine(DelayCallEndTurn());
+            if (playerStats.energy <= 0)
+            {
+                DeckManager.instance.HideHand();
+
+                if (autoEndTurn)
+                    StartCoroutine(DelayCallEndTurn());
+                else
+                    StartCoroutine(CheckForNoEnergy());
+            }
         }
     }
 
@@ -249,8 +280,24 @@ public class BattleManager : MonoBehaviour
             playerStats.energy -= cardData.energyCost;
             UpdateEnergyText();
 
-            if (playerStats.energy <= 0 && autoEndTurn)
-                StartCoroutine(DelayCallEndTurn());
+            if (playerStats.energy <= 0)
+            {
+                DeckManager.instance.HideHand();
+
+                if (autoEndTurn)
+                    StartCoroutine(DelayCallEndTurn());
+                else
+                    StartCoroutine(CheckForNoEnergy());
+            }
+        }
+    }
+    private IEnumerator CheckForNoEnergy()
+    {
+        yield return new WaitForSeconds(3f); // Espera 3 segundos
+
+        if (playerStats.energy <= 0 && playerTurn) // Verifica se ainda está sem energia e é o turno do player
+        {
+            StartCoroutine(UI_Manager.instance.ShowEndTurnArrow());
         }
     }
 

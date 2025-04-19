@@ -5,6 +5,7 @@ using UnityEngine;
 public class PlayerStats : CharacterStats
 {
     public static Action<PlayerStats, int> OnPlayerHit;
+    public static Action OnPlayerLevelUp;
 
     public static PlayerStats instance;
 
@@ -22,7 +23,6 @@ public class PlayerStats : CharacterStats
         {
             Destroy(this);
         }
-
     }
 
     protected override void Start()
@@ -45,7 +45,7 @@ public class PlayerStats : CharacterStats
 
     public void AddXP(int amout)
     {
-        currentXP += amout;
+        currentXP += amout * 2; //2 = Double XP
         CheckLevelUp();
         SaveFragmentData();
     }
@@ -66,6 +66,7 @@ public class PlayerStats : CharacterStats
         currentXP -= xpToNextLevel;  // Reduz o XP necessário para o próximo nível
         xpToNextLevel = Mathf.RoundToInt(xpToNextLevel * xpGrowthFactor);  // Aumenta o XP necessário com base no fator de crescimento
         player.PlayerFX.PlayLevelUpEffect();
+        OnPlayerLevelUp?.Invoke();
         Debug.Log("Level Up! Novo nível: " + level);
     }
 

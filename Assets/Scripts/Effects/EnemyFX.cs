@@ -6,6 +6,7 @@ public class EnemyFX : MonoBehaviour
     [SerializeField] private Transform textDamageSpawnPosition;
     [SerializeField] private GameObject textDamagePrefab;
     [SerializeField] private GameObject selectedEffect;
+    [SerializeField] private GameObject turnSelectedEffect;
 
     private Enemy_Stats _enemy;
 
@@ -13,12 +14,19 @@ public class EnemyFX : MonoBehaviour
     {
         _enemy = GetComponent<Enemy_Stats>();
         ShowSelectedEffect(false);
+        ShowTurnSelectionEffect(false);
     }
 
     public void ShowSelectedEffect(bool show)
     {
         if(selectedEffect != null)
             selectedEffect.SetActive(show);
+    }
+
+    public void ShowTurnSelectionEffect(bool show)
+    {
+        if(turnSelectedEffect != null)
+            turnSelectedEffect.SetActive(show);
     }
 
     private void EnemyHit(Enemy_Stats enemy, int damage,bool crit)

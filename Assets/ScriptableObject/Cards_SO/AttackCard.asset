@@ -20,3 +20,8 @@ MonoBehaviour:
   cardSprite: {fileID: 504852825071024247, guid: c682c1f614cc85540af6b064fdf3d010, type: 3}
   cardType: 0
   evolvedCard: {fileID: 11400000, guid: fde9b857dbfc46342bc308574b4cff27, type: 2}
+  isTemporary: 0
+  grantsEnergy: 0
+  healsPlayer: 0
+  healPercentage: 0
+  energyGranted: 0

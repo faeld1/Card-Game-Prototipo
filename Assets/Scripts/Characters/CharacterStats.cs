@@ -48,9 +48,9 @@ public class CharacterStats : MonoBehaviour
         }
 
         // Aplica os modificadores de acordo com o nível
-        Modify(damage, 10, 10000); // De +10 no level 2 a +10000 no level 100
-        Modify(maxHealth, 10, 10000); // De +10 no level 2 a +10000 no level 100
-        Modify(armor, 5, 50000); // De +5 no level 2 a +50000 no level 100
+        Modify(damage, 10, 1000); // De +10 no level 2 a +10000 no level 100
+        Modify(maxHealth, 10, 1000); // De +10 no level 2 a +10000 no level 100
+        Modify(armor, 5, 1000); // De +5 no level 2 a +50000 no level 100
 
        // Debug.Log($"Stats ajustados para o nível {level}. Damage: {damage.GetValue()}, MaxHealth: {maxHealth.GetValue()}, Armor: {armor.GetValue()}");
     }
@@ -59,7 +59,7 @@ public class CharacterStats : MonoBehaviour
     {
 
         // Calcula o valor de crescimento acumulativo baseado no level
-        float progress = Mathf.Pow((level - 1) / 99f, 1.6f); // Suaviza o progresso inicial com um expoente de 2
+        float progress = Mathf.Pow((level - 1) / 99f, 1.1f); // Suaviza o progresso inicial com um expoente de 2
         int accumulatedGain = Mathf.RoundToInt(Mathf.Lerp(minGain, maxGain, progress)); // Interpola o valor entre os limites
 
         // Adiciona o modificador ao stat
@@ -159,6 +159,11 @@ public class CharacterStats : MonoBehaviour
         if (remainingDamage > 0)
         {
             currentHealth -= remainingDamage;
+        }
+
+        if(currentHealth <= 0)
+        {
+            currentHealth = 0;
         }
 
 

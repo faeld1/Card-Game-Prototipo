@@ -17,8 +17,7 @@ MonoBehaviour:
   isUnlocked: 1
   subLevel1Enemies:
   - {fileID: 6222603041924583266, guid: 65d524aa8c444dc428be1e86b26e0391, type: 3}
-  - {fileID: 6222603041924583266, guid: 65d524aa8c444dc428be1e86b26e0391, type: 3}
-  - {fileID: 6222603041924583266, guid: 65d524aa8c444dc428be1e86b26e0391, type: 3}
+  - {fileID: 7412879801972949796, guid: 0ab4a03cd949cd040a3bd34775c8608a, type: 3}
   subLevel2Enemies:
   - {fileID: 6222603041924583266, guid: 65d524aa8c444dc428be1e86b26e0391, type: 3}
   subLevel3Enemies:

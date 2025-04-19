@@ -15,9 +15,13 @@ MonoBehaviour:
   cardName: Attack2_Plus
   description: Attack 20 - Plus
   energyCost: 1
-  attackValue: 4
+  attackValue: 3
   defenseValue: 0
   cardSprite: {fileID: 504852825071024247, guid: c682c1f614cc85540af6b064fdf3d010, type: 3}
   cardType: 0
   evolvedCard: {fileID: 0}
   isTemporary: 0
+  grantsEnergy: 0
+  healsPlayer: 0
+  healPercentage: 0
+  energyGranted: 0

@@ -59,7 +59,7 @@ public class LevelManager : MonoBehaviour
         }
         //Ganhou o subnivel
 
-        UI_Manager.instance.ShowEndGame();
+        UI_Manager.instance.ShowEndGame(true);
         DeckManager.instance.HideHand();
       
     }
