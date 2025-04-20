@@ -3,12 +3,12 @@ using UnityEngine;
 
 public class ShieldBar : MonoBehaviour
 {
-    private PlayerStats playerStats;
+    private CharacterStats stats;
     private TextMeshProUGUI shieldText;
 
     private void Start()
     {
-        playerStats = GetComponentInParent<PlayerStats>();
+        stats = GetComponentInParent<CharacterStats>();
         shieldText = GetComponentInChildren<TextMeshProUGUI>();
 
         UpdateShield();
@@ -16,7 +16,7 @@ public class ShieldBar : MonoBehaviour
 
     private void UpdateShield()
     {
-        shieldText.text = playerStats.shield.ToString();
+        shieldText.text = stats.shield.ToString();
     }
 
     private void OnEnable()

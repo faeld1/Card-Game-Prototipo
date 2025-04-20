@@ -1,5 +1,10 @@
 using UnityEngine;
-
+public enum EnemyActionType
+{
+    Attack,
+    Shield,
+    Heal
+}
 public class Enemy : MonoBehaviour
 {
     public Enemy_Stats Stats { get; set; }

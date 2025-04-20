@@ -1,12 +1,17 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class EnemyFX : MonoBehaviour
 {
+    [Header("HUD FX")]
     [SerializeField] private Transform textDamageSpawnPosition;
     [SerializeField] private GameObject textDamagePrefab;
     [SerializeField] private GameObject selectedEffect;
     [SerializeField] private GameObject turnSelectedEffect;
+
+    [Header("Cloud Thinking")]
+    [SerializeField] private CloudThinkingDisplay thinkingDisplay;
 
     private Enemy_Stats _enemy;
 
@@ -15,6 +20,13 @@ public class EnemyFX : MonoBehaviour
         _enemy = GetComponent<Enemy_Stats>();
         ShowSelectedEffect(false);
         ShowTurnSelectionEffect(false);
+
+        thinkingDisplay = GetComponentInChildren<CloudThinkingDisplay>();
+        HideNextAction();
+
+        // Faz o prefab do cloud conhecer o enemy
+        if (thinkingDisplay != null)
+            thinkingDisplay.Setup(_enemy);
     }
 
     public void ShowSelectedEffect(bool show)
@@ -27,6 +39,17 @@ public class EnemyFX : MonoBehaviour
     {
         if(turnSelectedEffect != null)
             turnSelectedEffect.SetActive(show);
+    }
+    public void ShowNextAction(EnemyAction[] actions)
+    {
+        if (thinkingDisplay != null)
+            thinkingDisplay.Show(actions);
+    }
+
+    public void HideNextAction()
+    {
+        if (thinkingDisplay != null)
+            thinkingDisplay.Hide();
     }
 
     private void EnemyHit(Enemy_Stats enemy, int damage,bool crit)

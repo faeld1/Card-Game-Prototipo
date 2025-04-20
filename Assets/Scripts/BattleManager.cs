@@ -42,6 +42,12 @@ public class BattleManager : MonoBehaviour
     {
         playerBaseEnergy = playerStats.energy;
 
+        StartCoroutine(StartBattleDelay()); // Inicia a batalha com um pequeno atraso
+    }
+
+    private IEnumerator StartBattleDelay()
+    {
+        yield return new WaitForSeconds(.1f);
         StartTurn();
     }
 
@@ -65,9 +71,25 @@ public class BattleManager : MonoBehaviour
                 rageStacks /= 2; // Reduz pela metade (arredondando para baixo)
                 UI_Manager.instance.UpdateRageUI(rageStacks);
             }
+
+            // Mostra as ações futuras dos inimigos (cloud thinking)
+            foreach (CharacterStats enemy in enemies)
+            {
+                if (enemy == null || enemy.currentHealth <= 0) continue;
+                Enemy_Stats eStats = enemy as Enemy_Stats;
+                EnemyFX fx = enemy.GetComponent<EnemyFX>();
+                EnemyAction[] nextActions = eStats.GetCurrentTurnActions();
+                fx.ShowNextAction(nextActions);
+            }
         }
         else
         {
+            // Reset a armadura do inimigo
+            foreach (CharacterStats enemy in enemies)
+            {
+                if (enemy == null || enemy.currentHealth <= 0) continue;
+                enemy.ResetShield();
+            }
             howTurnText.text = "Turno do Enemy!";
             playerStats.energy = 0;
             UI_Manager.instance.endTurnButton.interactable = false;
@@ -128,54 +150,103 @@ public class BattleManager : MonoBehaviour
         {
             CharacterStats enemy = enemies[i];
 
-            if (enemy != null)
-            {
-                EnemyFX fx = enemy.GetComponent<EnemyFX>();
-                fx.ShowTurnSelectionEffect(true); // Ativa o efeito de seleção do inimigo
-            }
+            /* if (enemy != null)
+             {
+                 EnemyFX fx = enemy.GetComponent<EnemyFX>();
+                 fx.ShowTurnSelectionEffect(true); // Ativa o efeito de seleção do inimigo
+             }*/
+
+            if (enemy == null || enemy.currentHealth <= 0)
+                continue;
+
+            Enemy_Stats eStats = enemy as Enemy_Stats;
+            Enemy enemyComponent = enemy.GetComponent<Enemy>();
+            EnemyFX fx = enemy.GetComponent<EnemyFX>();
+
+            fx.ShowTurnSelectionEffect(true);
 
 
             yield return new WaitForSeconds(0.6f); // Delay entre os ataques dos inimigos
-            if (enemy.currentHealth > 0 && enemy != null)
+
+            EnemyAction[] actions = eStats.GetCurrentTurnActions();
+
+            /* if (enemy.currentHealth > 0 && enemy != null)
+             {
+                 int enemyDamage = enemy.damage.GetValue(); // Dano do inimigo
+
+                 if (playerStats.TargetCanAvoidAttack(playerStats)) // Se o player esquivar
+                 {
+                     enemyDamage = 0;
+                 }
+
+                 PlayerAnimationsOnEnemyTurn(enemyDamage);
+
+                 isPlayerTakingHit = true;
+
+                 Enemy enemyAnimator = enemy.GetComponent<Enemy>();
+                 enemyAnimator.enemyAnim.SetTrigger("Attack"); // Animação de ataque do inimigo
+
+                 yield return new WaitForSeconds(0.2f); // Delay para o hit DamageText aparecer
+                 playerStats.TakeDamage(enemyDamage); // Aplica o dano
+                 VerifyPlayerIsAlive();
+
+
+
+                 yield return new WaitUntil(() => !isPlayerTakingHit); // Espera a animação terminar
+
+             }
+             else
+             {
+                 if (enemy != null)
+                 {
+                     //EnemyFX fx2 = enemy.GetComponent<EnemyFX>();
+                     //fx.ShowTurnSelectionEffect(false); // Ativa o efeito de seleção do inimigo
+                 }
+                 Debug.Log($"Enemy at index {i} is null or dead");
+             }*/
+            foreach (var action in actions)
             {
-                int enemyDamage = enemy.damage.GetValue(); // Dano do inimigo
-
-                if (playerStats.TargetCanAvoidAttack(playerStats)) // Se o player esquivar
+                switch (action.actionType)
                 {
-                    enemyDamage = 0;
+                    case EnemyActionType.Attack:
+                        int damage = eStats.damage.GetValue();
+
+                        if (playerStats.TargetCanAvoidAttack(playerStats))
+                            damage = 0;
+
+                        PlayerAnimationsOnEnemyTurn(damage);
+                        isPlayerTakingHit = true;
+
+                        enemyComponent.enemyAnim.SetTrigger("Attack");
+
+                        yield return new WaitForSeconds(0.2f);
+                        playerStats.TakeDamage(damage);
+                        VerifyPlayerIsAlive();
+                        yield return new WaitUntil(() => !isPlayerTakingHit);
+                        break;
+
+                    case EnemyActionType.Shield:
+                        eStats.IncreaseShield(1); // Multiplicador padrão
+                        yield return new WaitForSeconds(0.3f);
+                        break;
+
+                    case EnemyActionType.Heal:
+                        float healAmount = eStats.maxHealth.GetValue() * 0.2f;
+                        eStats.Heal(healAmount);
+                        yield return new WaitForSeconds(0.3f);
+                        break;
                 }
-
-                PlayerAnimationsOnEnemyTurn(enemyDamage);
-
-                isPlayerTakingHit = true;
-
-                Enemy enemyAnimator = enemy.GetComponent<Enemy>();
-                enemyAnimator.enemyAnim.SetTrigger("Attack"); // Animação de ataque do inimigo
-
-                yield return new WaitForSeconds(0.2f); // Delay para o hit DamageText aparecer
-                playerStats.TakeDamage(enemyDamage); // Aplica o dano
-                VerifyPlayerIsAlive();
-
-
-
-                yield return new WaitUntil(() => !isPlayerTakingHit); // Espera a animação terminar
-
-            }
-            else
-            {
-                if (enemy != null)
-                {
-                    EnemyFX fx = enemy.GetComponent<EnemyFX>();
-                    fx.ShowTurnSelectionEffect(false); // Ativa o efeito de seleção do inimigo
-                }
-                Debug.Log($"Enemy at index {i} is null or dead");
             }
 
             if (enemy != null)
             {
-                EnemyFX fx = enemy.GetComponent<EnemyFX>();
-                fx.ShowTurnSelectionEffect(false); // Ativa o efeito de seleção do inimigo
+                //EnemyFX fx2 = enemy.GetComponent<EnemyFX>();
+                //fx.ShowTurnSelectionEffect(false); // Ativa o efeito de seleção do inimigo
             }
+
+            eStats.AdvanceTurnAction();
+            fx.HideNextAction();
+            fx.ShowTurnSelectionEffect(false);
         }
 
         //Debug.Log("HideBlockHandCards sendo chamado no BattleManager");

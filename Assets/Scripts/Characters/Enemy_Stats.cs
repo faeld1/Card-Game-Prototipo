@@ -1,11 +1,21 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
+[System.Serializable]
+public class EnemyTurn
+{
+    public EnemyAction[] actions;
+}
 public class Enemy_Stats : CharacterStats
 {
     public static Action<int> OnEnemyDie;
     private DropItem myDropSystem;
     public Enemy enemy;
+
+    [Header("Actions")]
+    public List<EnemyTurn> actionSequence = new List<EnemyTurn>();
+    private int currentTurnIndex = 0;
 
     [SerializeField] private int xpReward = 5;
 
@@ -30,5 +40,23 @@ public class Enemy_Stats : CharacterStats
             myDropSystem.GenerateDrop();
             OnEnemyDie?.Invoke(xpReward);
         }
+    }
+
+    public EnemyAction[] GetCurrentTurnActions()
+    {
+        if (actionSequence.Count == 0)
+            return Array.Empty<EnemyAction>();
+
+        if (currentTurnIndex >= actionSequence.Count)
+            currentTurnIndex = 0;
+
+        return actionSequence[currentTurnIndex].actions;
+    }
+
+    public void AdvanceTurnAction()
+    {
+        currentTurnIndex++;
+        if (currentTurnIndex >= actionSequence.Count)
+            currentTurnIndex = 0;
     }
 }
