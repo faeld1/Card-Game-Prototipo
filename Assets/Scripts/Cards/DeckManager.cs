@@ -25,6 +25,9 @@ public class DeckManager : MonoBehaviour
     public Image[] handSlots;
     public RectTransform handContainer;
 
+    [SerializeField] private TextMeshProUGUI mainDeckCountText;
+    [SerializeField] private TextMeshProUGUI discardPileCountText;
+
     private Vector2 originalHandContainerPosition;
     private Vector2 hiddenPosition;
 
@@ -219,54 +222,28 @@ public class DeckManager : MonoBehaviour
 
         for (int i = 0; i < handSlots.Length; i++)
         {
-            if (i < hand.Count)
-            {
-                CardData card = hand[i];
-                handSlots[i].sprite = card.cardSprite;
+              var slot = handSlots[i];
+              if (slot == null) continue;
 
-                // Verificação do tipo da carta para exibir o valor correspondente
-                string cardValueText = "";
-                
-                switch (card.cardType)
-                {
-                    case CardType.Attack:
-                        cardValueText = card.attackValue.ToString();
-                        textColor = Color.red;
-                        break;
-                    case CardType.Defense:
-                        cardValueText = card.defenseValue.ToString();
-                        textColor = Color.blue;
-                        break;
-                    case CardType.Support:
-                        cardValueText = "Suporte"; // Ou outro valor ou símbolo específico para suporte
-                        textColor = Color.green;
-                        break;
-                }
+              CardHandSlotUI slotUI = slot.GetComponent<CardHandSlotUI>();
+              if (slotUI == null)
+              {
+                  Debug.LogWarning($"Slot {i} não possui CardHandSlotUI.");
+                  continue;
+              }
 
-
-                handSlots[i].transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = cardValueText;
-                handSlots[i].transform.GetChild(1).GetComponent<TextMeshProUGUI>().color = textColor;
-                
-
-                // Adiciona o CardDragHandler e atribui o CardData automaticamente
-                CardDragHandler dragHandler = handSlots[i].GetComponent<CardDragHandler>();
-                if (dragHandler == null)
-                    dragHandler = handSlots[i].gameObject.AddComponent<CardDragHandler>();
-
-                dragHandler.cardData = card; // Atribui o CardData automaticamente
-                dragHandler.cardType = card.cardType; // Atualiza o tipo da carta
-            }
-            else
-            {
-                handSlots[i].sprite = emptySlotSprite;
-                handSlots[i].transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = "";
-
-                // Remove o CardDragHandler se o slot está vazio
-                CardDragHandler dragHandler = handSlots[i].GetComponent<CardDragHandler>();
-                if (dragHandler != null)
-                    dragHandler.cardData = null;
-            }
+              if (i < hand.Count)
+                  slotUI.Setup(hand[i]);
+              else
+                  slotUI.ClearSlot();
         }
+
+        // Atualizar os card count
+        if (mainDeckCountText != null)
+            mainDeckCountText.text = mainDeck.Count.ToString();
+
+        if (discardPileCountText != null)
+            discardPileCountText.text = discardPile.Count.ToString();
     }
 
     public void RemoveTemporaryCards(List<CardData> temporaryCards)

@@ -17,7 +17,7 @@ MonoBehaviour:
   energyCost: 1
   attackValue: 3
   defenseValue: 0
-  cardSprite: {fileID: 504852825071024247, guid: c682c1f614cc85540af6b064fdf3d010, type: 3}
+  cardSprite: {fileID: -4002365293513660991, guid: ea6bd37a305cbb5439747badba9f995e, type: 3}
   cardType: 0
   evolvedCard: {fileID: 0}
   isTemporary: 0

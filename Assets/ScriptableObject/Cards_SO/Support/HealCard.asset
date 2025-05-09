@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: HealCard
   m_EditorClassIdentifier: 
   cardName: Heal01
-  description: 
+  description: Heal 1
   energyCost: 1
   attackValue: 0
   defenseValue: 0
-  cardSprite: {fileID: -809361918, guid: be55291aae08d434db3da3b59db3ab4a, type: 3}
+  cardSprite: {fileID: -1654411245749088812, guid: e8832aa02d0506e4182ab1a92856cd6c, type: 3}
   cardType: 2
   evolvedCard: {fileID: 0}
   isTemporary: 0

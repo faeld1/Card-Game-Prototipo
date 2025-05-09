@@ -18,7 +18,7 @@ namespace ES3Internal
         private static HashSet<ES3ReferenceMgrBase> mgrs = new HashSet<ES3ReferenceMgrBase>();
 #if UNITY_EDITOR
         protected static bool isEnteringPlayMode = false;
-        static readonly HideFlags[] invalidHideFlags = new HideFlags[] { HideFlags.DontSave, HideFlags.DontSaveInBuild, HideFlags.DontSaveInEditor, HideFlags.HideAndDontSave };
+        static readonly HideFlags[] invalidHideFlags = new HideFlags[] { HideFlags.HideInHierarchy, HideFlags.DontSave, HideFlags.DontSaveInBuild, HideFlags.DontSaveInEditor, HideFlags.HideAndDontSave };
 #endif
 
 #if !UNITY_EDITOR
@@ -104,7 +104,7 @@ namespace ES3Internal
                         var mgr = GetManagerFromScene(loadedScene, false);
                         if (mgr != null)
                         {
-                            ES3Debug.LogWarning($"The reference you're trying to save does not exist in any scene, or the scene it belongs to does not contain an Easy Save 3 Manager. Using the reference manager from scene {loadedScene.name} instead. This may cause unexpected behaviour or leak memory in some situations.");
+                            ES3Debug.LogWarning($"The reference you're trying to save does not exist in any scene, or the scene it belongs to does not contain an Easy Save 3 Manager. Using the reference manager from scene {loadedScene.name} instead. This may cause unexpected behaviour or leak memory in some situations. See <a href=\"https://docs.moodkie.com/easy-save-3/es3-guides/saving-and-loading-references/\">the Saving and Loading References guide</a> for more information.");
                             return mgr;
                         }
                     }
@@ -244,10 +244,13 @@ namespace ES3Internal
                     return globalRef;
             }
 
-            if (type != null)
-                ES3Debug.LogWarning("Reference for " + type + " with ID " + id + " could not be found in Easy Save's reference manager. See <a href=\"https://docs.moodkie.com/easy-save-3/es3-guides/saving-and-loading-references/#reference-could-not-be-found-warning\">the Saving and Loading References guide</a> for more information.", this);
-            else
-                ES3Debug.LogWarning("Reference with ID " + id + " could not be found in Easy Save's reference manager. See <a href=\"https://docs.moodkie.com/easy-save-3/es3-guides/saving-and-loading-references/#reference-could-not-be-found-warning\">the Saving and Loading References guide</a> for more information.", this);
+            if (!suppressWarnings)
+            {
+                if (type != null)
+                    ES3Debug.LogWarning("Reference for " + type + " with ID " + id + " could not be found in Easy Save's reference manager. See <a href=\"https://docs.moodkie.com/easy-save-3/es3-guides/saving-and-loading-references/#reference-could-not-be-found-warning\">the Saving and Loading References guide</a> for more information.", this);
+                else
+                    ES3Debug.LogWarning("Reference with ID " + id + " could not be found in Easy Save's reference manager. See <a href=\"https://docs.moodkie.com/easy-save-3/es3-guides/saving-and-loading-references/#reference-could-not-be-found-warning\">the Saving and Loading References guide</a> for more information.", this);
+            }
 
             return null;
         }
@@ -704,9 +707,12 @@ namespace ES3Internal
                 return true;
 
             foreach (var flag in invalidHideFlags)
-                if ((obj.hideFlags & flag) != 0 && obj.hideFlags != HideFlags.HideInHierarchy && obj.hideFlags != HideFlags.HideInInspector && obj.hideFlags != HideFlags.NotEditable)
+                if ((obj.hideFlags & flag) != 0 && /*obj.hideFlags != HideFlags.HideInHierarchy &&*/ obj.hideFlags != HideFlags.HideInInspector && obj.hideFlags != HideFlags.NotEditable)
                     if (!(obj is Mesh || obj is Material))
                         return false;
+
+            if (obj is UnityEngine.U2D.SpriteAtlas)
+                return false;
 
             // Exclude the Easy Save 3 Manager, and all components attached to it.
             if (obj.name == "Easy Save 3 Manager")
@@ -714,6 +720,17 @@ namespace ES3Internal
 #endif
             return true;
         }
+
+#if UNITY_EDITOR
+        public void ExcludeObject(UnityEngine.Object obj)
+        {
+            if (excludeObjects == null)
+                excludeObjects = new List<UnityEngine.Object>();
+
+            if (!excludeObjects.Contains(obj))
+                excludeObjects.Add(obj);
+        }
+#endif
     }
 
     [System.Serializable]

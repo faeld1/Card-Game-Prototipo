@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: EnergyCard
   m_EditorClassIdentifier: 
   cardName: Energy01
-  description: 
+  description: Energia 1
   energyCost: 0
   attackValue: 0
   defenseValue: 0
-  cardSprite: {fileID: 127570159, guid: be55291aae08d434db3da3b59db3ab4a, type: 3}
+  cardSprite: {fileID: 3957021736051365369, guid: 21fc06e31eb2b6b4e818cc58e5374306, type: 3}
   cardType: 2
   evolvedCard: {fileID: 11400000, guid: a456bd45ab97c1f4d8d91c75824e98b2, type: 2}
   isTemporary: 0

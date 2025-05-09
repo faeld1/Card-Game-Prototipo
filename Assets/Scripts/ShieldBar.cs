@@ -3,12 +3,14 @@ using UnityEngine;
 
 public class ShieldBar : MonoBehaviour
 {
-    private CharacterStats stats;
+    [SerializeField] private CharacterStats stats;
     private TextMeshProUGUI shieldText;
 
     private void Start()
     {
-        stats = GetComponentInParent<CharacterStats>();
+        if(stats == null)
+            stats = GetComponentInParent<CharacterStats>();
+
         shieldText = GetComponentInChildren<TextMeshProUGUI>();
 
         UpdateShield();
@@ -16,7 +18,19 @@ public class ShieldBar : MonoBehaviour
 
     private void UpdateShield()
     {
-        shieldText.text = stats.shield.ToString();
+        //shieldText.text = stats.shield.ToString();
+
+        int shieldValue = stats.shield;
+
+        if (shieldValue >= 1000)
+        {
+            int rounded = Mathf.RoundToInt(shieldValue / 1000f); // Arredonda corretamente
+            shieldText.text = $"{rounded}k";
+        }
+        else
+        {
+            shieldText.text = shieldValue.ToString();
+        }
     }
 
     private void OnEnable()

@@ -46,6 +46,11 @@ public class HealthBar : MonoBehaviour
                 this.enemy.enemyAnim.SetBool("IsDead", true);
                 isDead = true;
                 Debug.Log("Enemy Death Animation");
+
+                // Desativa o componente CloudThinkingDisplay, se existir
+                CloudThinkingDisplay cloud = enemy.GetComponentInChildren<CloudThinkingDisplay>(true);
+                if (cloud != null)
+                    cloud.gameObject.SetActive(false);
             }
             if (player != null)
             {
@@ -53,6 +58,14 @@ public class HealthBar : MonoBehaviour
             }
 
             this.slider.gameObject.SetActive(false);
+
+            // Desativa o componente ShieldBar, se existir
+            if(myStats != null)
+            {
+                ShieldBar shieldBar = myStats.GetComponentInChildren<ShieldBar>(true);
+                if (shieldBar != null)
+                    shieldBar.gameObject.SetActive(false);
+            }
 
             StartCoroutine(DeathWithDelay());
         }

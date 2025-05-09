@@ -12,7 +12,7 @@ public class BattleManager : MonoBehaviour
     [Header("Special")]
     public int rageStacks = 0; //Contador de Raiva
 
-    public TextMeshProUGUI howTurnText;
+    public TextMeshProUGUI whoTurnText;
 
     private bool playerTurn = true;
     int gameOverOnce = 1;
@@ -40,6 +40,7 @@ public class BattleManager : MonoBehaviour
 
     private void Start()
     {
+        Time.timeScale = 1f; // Garante que o jogo está despausado ao carregar a cena
         playerBaseEnergy = playerStats.energy;
 
         StartCoroutine(StartBattleDelay()); // Inicia a batalha com um pequeno atraso
@@ -55,7 +56,8 @@ public class BattleManager : MonoBehaviour
     {
         if (playerTurn)
         {
-            howTurnText.text = "Turno do Player!";
+            whoTurnText.text = "Turno do Player!";
+            UI_Manager.instance.MoveWhoTurn(true, 0);
             DeckManager.instance.ShowHand();
             UI_Manager.instance.endTurnButton.interactable = true;
             // UI_Manager.instance.HideBlockHandCards();
@@ -84,16 +86,19 @@ public class BattleManager : MonoBehaviour
         }
         else
         {
+            DeckManager.instance.HideHand(); // Esconde a mão do jogador
             // Reset a armadura do inimigo
             foreach (CharacterStats enemy in enemies)
             {
                 if (enemy == null || enemy.currentHealth <= 0) continue;
                 enemy.ResetShield();
             }
-            howTurnText.text = "Turno do Enemy!";
+            whoTurnText.text = "Turno do Enemy!";
             playerStats.energy = 0;
             UI_Manager.instance.endTurnButton.interactable = false;
+            UI_Manager.instance.MoveWhoTurn(true, 0);
             UI_Manager.instance.DisableArrow();
+            UI_Manager.instance.ResetSpecialEffects();
             //DeckManager.instance.HideHand();
             UI_Manager.instance.ShowBlockHandCards();
             StartCoroutine(DiscardHandDelay());

@@ -329,11 +329,11 @@ Transform:
   - {fileID: 2490848336520387158}
   - {fileID: 3841595987548757739}
   - {fileID: 8164658022607011346}
+  - {fileID: 3035554343280665339}
   - {fileID: 3378599676641193965}
   - {fileID: 7245691893051885784}
   - {fileID: 8342571673809934714}
   - {fileID: 4836891274487320760}
-  - {fileID: 3035554343280665339}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &603193588881269289
@@ -387,8 +387,8 @@ MonoBehaviour:
   enemy: {fileID: 0}
   actionSequence:
   - actions:
+    - actionType: 0
     - actionType: 1
-    - actionType: 2
   - actions:
     - actionType: 1
   xpReward: 2
@@ -741,23 +741,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5506587805964090268, guid: 42b969258c3b9dd439f9d197d8ee2404, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.27019
+      value: 0.34343854
       objectReference: {fileID: 0}
     - target: {fileID: 5506587805964090268, guid: 42b969258c3b9dd439f9d197d8ee2404, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.27019
+      value: 0.34343854
       objectReference: {fileID: 0}
     - target: {fileID: 5506587805964090268, guid: 42b969258c3b9dd439f9d197d8ee2404, type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.27019
+      value: 0.34343854
       objectReference: {fileID: 0}
     - target: {fileID: 5506587805964090268, guid: 42b969258c3b9dd439f9d197d8ee2404, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.764
+      value: 0.775
       objectReference: {fileID: 0}
     - target: {fileID: 5506587805964090268, guid: 42b969258c3b9dd439f9d197d8ee2404, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.092
+      value: 0.176
       objectReference: {fileID: 0}
     - target: {fileID: 6220771576581954644, guid: 42b969258c3b9dd439f9d197d8ee2404, type: 3}
       propertyPath: m_Pivot.x

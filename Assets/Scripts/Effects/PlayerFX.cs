@@ -1,6 +1,7 @@
-using UnityEngine;
-using TMPro;
 using System.Collections;
+using System.Collections.Generic;
+using TMPro;
+using UnityEngine;
 
 public class PlayerFX : MonoBehaviour
 {
@@ -11,23 +12,69 @@ public class PlayerFX : MonoBehaviour
     [SerializeField] private GameObject healEffect;
     [SerializeField] private GameObject levelUpEffect;
 
+    [Header("OutLine FX")]
+    private Renderer[] renderers;
+    private Material[] outlineMaterials;
+
     private PlayerStats playerStats;
 
     private void Start()
     {
         playerStats = GetComponent<PlayerStats>();
         ShowSelectedEffect(false); // Garantir que o efeito esteja desativado no início
+
+        SelectedMaterialSetup();
     }
+
+
+
+
+    private void SelectedMaterialSetup()
+    {
+        renderers = GetComponentsInChildren<Renderer>();
+
+        // Cria instâncias únicas dos materiais para não afetar globalmente
+        List<Material> mats = new List<Material>();
+        foreach (var rend in renderers)
+        {
+            Material instanced = rend.material;
+            mats.Add(instanced);
+            rend.material = instanced;
+        }
+
+        outlineMaterials = mats.ToArray();
+    }
+
     public void ShowSelectedEffect(bool show)
     {
         if (selectedEffect != null)
-            selectedEffect.SetActive(show);
+            selectedEffect.SetActive(false);
+
+        // selectedEffect.SetActive(show); //Se quiser o selectEffect funcionando use esse aqui acima
+
+        if (outlineMaterials == null) return;
+
+        foreach (Material mat in outlineMaterials)
+        {
+            if (show)
+            {
+                mat.SetColor("_OutlineColor", new Color(.9f, .9f, .9f, 0.5f)); // laranja
+                mat.SetFloat("_OutlineWidth", 3.5f);
+
+
+            }
+            else
+            {
+                mat.SetFloat("_OutlineWidth", 1f);
+                mat.SetColor("_OutlineColor", new Color(0f, 0f, 0f)); // preto
+            }
+        }
     }
 
 
     private void PlayerHit(PlayerStats player, int damage)
     {
-        if(playerStats == player && player != null)
+        if (playerStats == player && player != null)
         {
             float randomX = Random.Range(-0.5f, 0.5f);
             float randomY = Random.Range(0f, 1f);

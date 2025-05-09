@@ -257,6 +257,7 @@ public class Player : MonoBehaviour
             //rageStacks = 0; // Reseta a raiva
             BattleManager.instance.rageStacks = 0;
             UI_Manager.instance.UpdateRageUI(BattleManager.instance.rageStacks);
+            UI_Manager.instance.ResetSpecialMarkers();
 
             isSpecialAttacking = true;
             specialAttackQueue.Clear();

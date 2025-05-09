@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -9,6 +10,10 @@ public class EnemyFX : MonoBehaviour
     [SerializeField] private GameObject textDamagePrefab;
     [SerializeField] private GameObject selectedEffect;
     [SerializeField] private GameObject turnSelectedEffect;
+
+    [Header("OutLine FX")]
+    private Renderer[] renderers;
+    private Material[] outlineMaterials;
 
     [Header("Cloud Thinking")]
     [SerializeField] private CloudThinkingDisplay thinkingDisplay;
@@ -27,12 +32,50 @@ public class EnemyFX : MonoBehaviour
         // Faz o prefab do cloud conhecer o enemy
         if (thinkingDisplay != null)
             thinkingDisplay.Setup(_enemy);
+
+        SelectedMaterialSetup();
+    }
+
+    private void SelectedMaterialSetup()
+    {
+        renderers = GetComponentsInChildren<Renderer>();
+
+        // Cria instâncias únicas dos materiais para não afetar globalmente
+        List<Material> mats = new List<Material>();
+        foreach (var rend in renderers)
+        {
+            Material instanced = rend.material;
+            mats.Add(instanced);
+            rend.material = instanced;
+        }
+
+        outlineMaterials = mats.ToArray();
     }
 
     public void ShowSelectedEffect(bool show)
     {
         if(selectedEffect != null)
-            selectedEffect.SetActive(show);
+            selectedEffect.SetActive(false);
+
+        // selectedEffect.SetActive(show); //Se quiser o selectEffect funcionando use esse aqui acima
+
+        if (outlineMaterials == null) return;
+
+        foreach (Material mat in outlineMaterials)
+        {
+            if (show)
+            {
+                mat.SetColor("_OutlineColor", new Color(.9f, .9f, .9f,0.5f)); // laranja
+                mat.SetFloat("_OutlineWidth", 10f);
+
+                
+            }
+            else
+            {
+                mat.SetFloat("_OutlineWidth", 1.5f);
+                mat.SetColor("_OutlineColor", new Color(0f,0f,0f)); // preto
+            }
+        }
     }
 
     public void ShowTurnSelectionEffect(bool show)
